@@ -28,11 +28,21 @@
   width: 300px;
 }
 
+
 .navbar-right .icon {
-  margin-left: 20px;
+  padding: 8px 12px;
   font-size: 20px;
   cursor: pointer;
 }
 .navbar-right .icon:hover {
   color: #005fa3;
+}
+
+.navbar-right button {
+  background-color:  #fff2f7;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
 }

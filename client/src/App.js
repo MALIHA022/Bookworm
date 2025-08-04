@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/sidebar';
 import Navbar from './components/navbar';
+import CreatePost from './pages/createpostpage';
 
 const App = () => {
   return (
@@ -15,6 +16,8 @@ const App = () => {
           <Route path="/bookmarks" element={<h1>Bookmarks</h1>} />
           <Route path="/favorites" element={<h1>Favorites</h1>} />
           <Route path="/settings" element={<h1>Settings</h1>} />
+          <Route path="/create-post" element={<CreatePost />} />
+          {/* <Route path="/profile" element={<h1>Profile</h1>} /> */}
         </Routes>
       </div>
     </Router>
@@ -22,3 +25,4 @@ const App = () => {
 };
 
 export default App;
+
