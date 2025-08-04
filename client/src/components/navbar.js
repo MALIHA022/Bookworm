@@ -13,7 +13,8 @@ const openmodal = () => {
   return (
     <div className="navbar">
       <div className="navbar-logo">
-        <img src="logo.png" alt="BookWorm Logo" />
+        <img src='/logo.png' alt="BookWorm Logo" /> 
+      <div className="navbar-title">BookWorm</div>
       </div>
       <div className="navbar-right">
         <input type="text" placeholder="Search books..." className="search-bar" />
