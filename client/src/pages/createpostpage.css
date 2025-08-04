@@ -36,3 +36,34 @@
 .book-post-form button:hover {
   background-color: #005fa3;
 }
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  padding: 2rem;
+  border-radius: 12px;
+  width: 400px;
+ 
+}
+.close-btn {
+  position: absolute;
+  margin-left: 400px;
+  margin-top: 40px;
+  font-size: 13px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c80000;
+}

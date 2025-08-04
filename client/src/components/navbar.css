@@ -28,9 +28,14 @@
   width: 300px;
 }
 
+.navbar-right {
+  display: flex;
+  align-items: center;
+  margin-right: 35px;
+}
 
 .navbar-right .icon {
-  padding: 8px 12px;
+  padding: 8px 14px;
   font-size: 20px;
   cursor: pointer;
 }
