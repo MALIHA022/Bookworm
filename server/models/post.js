@@ -5,14 +5,15 @@ const postSchema = new mongoose.Schema({
   author: String,
   description: String,
 
-  likes: {
-    type: Number,
-    default: 0
-  },
-  bookmarks: {
-    type: Number,   
-    default: 0
-  },
+likes: {
+  type: [String], // [mongoose.Schema.Types.ObjectId] using users later
+  default: [],
+},
+bookmarks: {
+  type: [String],
+  default: [],
+},
+
 
 }, { timestamps: true });
 

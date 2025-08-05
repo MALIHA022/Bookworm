@@ -32,8 +32,10 @@ const PostCard = ({ post }) => {
                   <button onClick={() => setShowDropdown(!showDropdown)}>⋮</button>
                   {showDropdown && (
                   <div className="dropdown">
+                      <button>🔄 Edit</button>
                       <button>🚫 Report</button>
                       <button>🙅 Not Interested</button>
+                      <button>🗑️ Delete</button>
                   </div>
                   )}
             </div>

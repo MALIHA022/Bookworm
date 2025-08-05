@@ -5,6 +5,8 @@ import Sidebar from './components/sidebar';
 import Navbar from './components/navbar';
 
 import Home from './pages/home';
+import Favorites from './pages/likedpost';
+import Bookmarks from './pages/bookmarked';
 import CreatePost from './pages/createpostpage';
 
 function App() {
@@ -53,8 +55,8 @@ function App() {
         <Routes location={state?.backgroundLocation || location}>
           <Route path="/" element={<Home posts={posts} />} />
           <Route path="/explore" element={<h1>Explore</h1>} />
-          <Route path="/bookmarks" element={<h1>Bookmarks</h1>} />
-          <Route path="/favorites" element={<h1>Favorites</h1>} />
+          <Route path="/bookmarks" element={<Bookmarks userId={state?.userId} />} />
+          <Route path="/favorites" element={<Favorites userId={state?.userId} />} />
           <Route path="/settings" element={<h1>Settings</h1>} />
           <Route path="/create-post" element={<CreatePost />} />
         </Routes>
