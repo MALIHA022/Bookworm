@@ -17,10 +17,15 @@ function App() {
   // Load posts from backend
   useEffect(() => {
     const fetchPosts = async () => {
-      const res = await fetch('http://localhost:5000/api/books');
-      const data = await res.json();
-      setPosts(data);
+      try {
+        const res = await fetch('http://localhost:5000/api/books'); // Adjust port if needed
+        const data = await res.json();
+        setPosts(data);
+      } catch (err) {
+        console.error("Failed to fetch posts", err);
+      }
     };
+
     fetchPosts();
   }, []);
 
@@ -67,20 +72,4 @@ function App() {
 
 export default App;
 
-// const handleCreatePost = async (post) => {
-//   try {
-//     const response = await fetch('http://localhost:5000/api/books', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(post),
-//     });
-
-//     if (!response.ok) throw new Error('Failed to post book');
-
-//     const result = await response.json();
-//     console.log("Posted:", result);
-//   } catch (err) {
-//     alert(err.message);
-//   }
-// };
 

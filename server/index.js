@@ -9,6 +9,9 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
+const postRoutes = require('./routes/posts');
+app.use('/api', postRoutes);
+
 // MongoDB Connection
 mongoose.connect('mongodb://localhost:27017/bookworm', {
   useNewUrlParser: true,
