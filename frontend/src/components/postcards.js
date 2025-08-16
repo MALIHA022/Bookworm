@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './postcards.css';
 
 const PostCard = ({ post }) => {
+  const [wishlisted, setWhishlisted] = useState(false);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -22,6 +23,9 @@ const PostCard = ({ post }) => {
         </div>
         
         <div className="post-actions">
+            <button onClick={() => setWhishlisted(!wishlisted)}>
+              {wishlisted ? '📝' : '📃'}
+            </button>
             <button onClick={() => setBookmarked(!bookmarked)}>
               {bookmarked ? '🔖' : '💾'}
             </button>
