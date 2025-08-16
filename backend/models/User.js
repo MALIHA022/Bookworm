@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');  
+const mongoose = require('mongoose'); 
 const bcrypt = require('bcryptjs');    
 
 const { Schema } = mongoose;
@@ -21,9 +21,11 @@ userSchema.pre('save', async function (next) {
 });
 
 // Compare password
-userSchema.methods.comparePassword = function (candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    console.log("Comparing passwords...");
+    return bcrypt.compare(candidatePassword, this.password);  // Compare with the stored hashed password
 };
+
 
 // Export the model
 module.exports = mongoose.model('User', userSchema);
