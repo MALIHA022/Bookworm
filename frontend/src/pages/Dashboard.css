@@ -4,6 +4,12 @@
   flex-direction: column; 
 }
 
+.bookmarks-container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column; 
+}
+
 .posts-section {
   position: relative;
   display: flex;

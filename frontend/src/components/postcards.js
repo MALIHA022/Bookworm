@@ -1,5 +1,5 @@
 // components/PostCard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './postcards.css';
 
 const PostCard = ({ post }) => {

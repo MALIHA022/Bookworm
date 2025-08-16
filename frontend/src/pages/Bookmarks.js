@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import PostCard from './PostCard';  // Reuse the PostCard component
-import './Bookmarks.css';
+
+import Navbar2 from '../components/navbar2';
+import Sidebar from '../components/sidebar';
+import PostCard from '../components/postcards';  // Reuse the PostCard component
+
+import './Dashboard.css';
 
 const Bookmarks = () => {
   const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
@@ -24,17 +28,24 @@ const Bookmarks = () => {
   }, []);
 
   return (
-    <div className="bookmarks-container">
-      <h2>Your Bookmarked Posts</h2>
-      {bookmarkedPosts.length === 0 ? (
-        <p>No bookmarked posts yet.</p>
-      ) : (
-        bookmarkedPosts.map(post => (
-          <PostCard key={post._id} post={post} />
-        ))
-      )}
-    </div>
-  );
-};
+    <div className="bookmarks-page">
+      <Navbar2 />
+      <Sidebar />
+        <div className="bookmarks-container">
+          <div className="posts-section">
+          <h2>Bookmarked Posts</h2>
+            {bookmarkedPosts.length === 0 ? (
+              <p>No bookmarked posts yet.</p>
+            ) : (
+              bookmarkedPosts.map(post => (
+                <PostCard key={post._id} post={post} />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+}
 
 export default Bookmarks;
+

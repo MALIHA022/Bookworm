@@ -8,7 +8,7 @@ const Sidebar = () => {
     { to: '/', icon: '🏠', label: 'Home' },
     { to: '/explore', icon: '🔍', label: 'Explore' },
     { to: '/bookmarks', icon: '📖', label: 'Bookmarks' },
-    { to: '/favorites', icon: '❤️', label: 'Favorites' },
+    { to: '/wishlist', icon: '📋', label: 'Wishlist' },
     { to: '/usersettings', icon: '⚙️', label: 'Settings' },
   ];
 
@@ -25,16 +25,3 @@ const Sidebar = () => {
 
 export default Sidebar;
 
-// import React from "react";
-// import { NavLink } from "react-router-dom";
-
-// export default function Sidebar() {
-//     return (
-//         <div className="sidebar">
-//             <NavLink to="/home">Home</NavLink>
-//             <NavLink to="/bookmarks">Bookmarked Posts</NavLink>
-//             <NavLink to="/likes">Liked Posts</NavLink>
-//             <NavLink to="/settings">Account Settings</NavLink>
-//         </div>
-//     );
-// }
