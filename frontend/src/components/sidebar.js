@@ -9,7 +9,7 @@ const Sidebar = () => {
     { to: '/explore', icon: '🔍', label: 'Explore' },
     { to: '/bookmarks', icon: '📖', label: 'Bookmarks' },
     { to: '/favorites', icon: '❤️', label: 'Favorites' },
-    { to: '/settings', icon: '⚙️', label: 'Settings' },
+    { to: '/usersettings', icon: '⚙️', label: 'Settings' },
   ];
 
   return (
