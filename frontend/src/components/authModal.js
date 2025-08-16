@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { registerUser, loginUser } from '../utils/auth'; // Ensure correct import
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
 import './modal.css';
 
 const AuthModal = ({ type, onClose, onSuccess }) => {
@@ -11,6 +11,8 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
   const [gender, setGender] = useState('');
   const [dob, setDob] = useState('');
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,6 +36,9 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
 
       // Success callback
       onSuccess();
+      navigate('/dashboard'); //redirect to dashboard
+
+
     } catch (error) {
       setError(error.response?.data?.error || 'An unexpected error occurred.');
     }
