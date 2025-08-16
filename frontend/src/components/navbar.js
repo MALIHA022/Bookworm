@@ -14,8 +14,8 @@ const Navbar = ({ onLoginClick, onRegisterClick }) => {
        <div className="navbar-title">BookWorm</div>
        </div>
       <div className="navbar-right">
-        <button onClick={onLoginClick}>Login</button>
-        <button onClick={onRegisterClick}>Register</button>
+        <button className="buttons" onClick={onLoginClick}>Login</button>
+        <button className="buttons" onClick={onRegisterClick}>Register</button>
       </div>
     </nav>
   );

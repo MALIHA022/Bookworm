@@ -86,11 +86,27 @@
     align-items: center;
 }
 
-.dropdown-menu button {
+.dropdown-menu .buttons{
   background-color: white;
   color: #fc6ea5;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
   border-radius: 5px;
+}
+
+.dropdown-menu-plus {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 55px;
+    color: black;
+    padding: 2px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-evenly;
+    align-items: center;
+
 }
