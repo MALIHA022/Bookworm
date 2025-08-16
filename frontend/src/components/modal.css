@@ -1,7 +1,3 @@
-.default-form h2 {
-  margin-bottom: 16px;
-  color: #333;
-}
 
 .modal-overlay {
   position: fixed;
@@ -17,20 +13,20 @@
 }
 
 .modal-content {
-  padding: 2rem;
-  border-radius: 12px;
-  width: 400px;
- 
+  padding: 20px;
+  border-radius: 8px;
+  position: relative;
+  
 }
 .close-btn {
   position: absolute;
-  margin-left: 400px;
-  margin-top: 40px;
   font-size: 13px;
   background: none;
   border: none;
   cursor: pointer;
-  color: #c80000;
+  color: #c80000; 
+  top: 60px;
+  right: 0px;
 }
 
 .default-form {
@@ -48,8 +44,21 @@
   color: red;
 }
 
+.default-form h2 {
+  margin-bottom: 16px;
+  color: #333;
+}
+
 .default-form input,
 .default-form textarea{
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.default-form select {
   margin-bottom: 12px;
   padding: 10px;
   border-radius: 6px;
