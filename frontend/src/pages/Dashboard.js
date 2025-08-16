@@ -1,30 +1,51 @@
-import React, { useState } from 'react';
-import './Dashboard.css'; 
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Sidebar from '../components/sidebar';
-import Navbar2 from '../components/navbar2'; 
-import { useNavigate } from 'react-router-dom';
+import Navbar2 from '../components/navbar2';
+import './Dashboard.css';
+import PostCard from '../components/postcards';
 
 const Dashboard = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user')); 
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/'; // Redirect to home page after logout
-  };
+  // Fetch posts when component mounts
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/posts');
+        setPosts(response.data);
+      } catch (err) {
+        console.error('Error fetching posts', err);
+        setError('Failed to load posts. Please try again later.');
+      }
+    };
+
+    fetchPosts();
+  }, []);
 
   return (
     <div className="dashboard-container">
       <Sidebar />
-        <Navbar2 user={user} setShowDropdown={setShowDropdown} 
-        showDropdown={showDropdown} handleLogout={handleLogout} />
-
       <div className="main-content">
-        <div className="posts-section">
-            <h3>User's Post Title</h3>
-            <p>This is a sample post content.</p>
-        </div>
+        <Navbar2 />
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+        {/* Posts Section */}
+         <div className="posts-section">
+            {error && <p>{error}</p>}
+            {posts.length === 0 ? (
+              <p>No posts available.</p>
+            ) : (
+              posts.map(post => (
+                <PostCard key={post._id} post={post} />
+              ))
+            )}
+          </div>
       </div>
     </div>
   );

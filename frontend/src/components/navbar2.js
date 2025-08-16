@@ -10,8 +10,24 @@ const Navbar2 = () => {
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);  // State for account dropdown
   const [modalOpen, setModalOpen] = useState(false);  // Track if modal is open
   const [postType, setPostType] = useState('');  // Track the post type (review, donate, sell)
-  const user = JSON.parse(localStorage.getItem('user')); 
   
+  const user = localStorage.getItem('user');
+  let parsedUser = null;  
+
+  // Ensure the user data exists and is a valid string before parsing
+  if (user) {
+    try {
+      parsedUser = JSON.parse(user);
+    } catch (error) {
+      console.error('Error parsing user data:', error);  // Handle parsing error
+    }
+  } 
+
+  if (!parsedUser) {
+    console.log("No valid user data found in localStorage.");
+  } else {
+    console.log("User data:", parsedUser);  // Check what data is fetched
+  }
   // Logout handler
   const handleLogout = () => {
     localStorage.removeItem('token');

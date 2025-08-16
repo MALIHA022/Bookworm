@@ -5,31 +5,12 @@
 }
 
 .posts-section {
+  position: relative;
   display: flex;
+  flex-direction: column;
   flex-grow: 1;
   margin-top: 60px;
   padding: 20px;
   background-color: #f4f4f4;
-  left: 250px; /* Adjust based on sidebar width */
-}
-
-.posts-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.post {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.post h3 {
-  margin-bottom: 10px;
-}
-
-.post p {
-  font-size: 1rem;
+  left: 60px;
 }
