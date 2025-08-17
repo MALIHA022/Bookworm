@@ -1,7 +1,7 @@
 //jwt verification, handle user role authorization
 
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || 'jwtsecretkey';
+const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
 
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;
