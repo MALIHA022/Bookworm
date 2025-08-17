@@ -1,7 +1,11 @@
+// localstorage info - sends back full user info - backend
+
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const router = express.Router();  // Correctly using router
+const bcrypt = require('bcryptjs');
+const authMiddleware = require('../middleware/authMiddleware'); // Import the auth middleware
 
 // Register route
 router.post('/register', async (req, res) => {
@@ -21,43 +25,52 @@ router.post('/register', async (req, res) => {
     }
 });
 
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+// Login controller
+    router.post("/login", async (req, res) => {
+      try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email }); 
 
-    // Validate that email and password are provided
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Please provide both email and password' });
+        if (!user) return res.status(400).json({ error: "User not found" });    
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });    
+
+        // Generate JWT
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });  
+
+        // full user info
+        res.json({
+          message: "Login successful",
+          token,
+          user: {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            gender: user.gender,
+            dob: user.dob,
+        },
+    });
+          console.log('Sending login response:', {
+                message: "Login successful",
+                token,
+                user: {
+                  id: user._id,
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  email: user.email,
+                  gender: user.gender,
+                  dob: user.dob,
+                },
+              });
+
+
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+      }
     }
-
-    console.log("Received email:", email); // Log the received email
-    console.log("Received password:", password); // Log the received password
-
-    try {
-        // Find the user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            console.log('User not found'); // Log when user is not found
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
-
-        // Compare the provided password with the stored hashed password
-        const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            console.log('Password mismatch'); // Log when passwords don't match
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
-
-        // Create JWT token
-        const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        // Return the token and user information
-        console.log('Login successful'); // Log successful login
-        res.json({ token, message: 'Login successful!' });
-
-    } catch (err) {
-        console.error('Login error:', err);  // Log any unexpected errors
-        res.status(500).json({ error: 'An unexpected error occurred' });
-    }
-});
+    );
 
 module.exports = router;  // Export router correctly

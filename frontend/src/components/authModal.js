@@ -18,26 +18,40 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
     e.preventDefault();
     setError('');
 
-    const userData = { firstName, lastName, email, password, gender, dob };
-
     try {
-      let data;
+      let res, data;
+
       if (type === 'register') {
-        const res = await axios.post('http://localhost:5000/api/auth/register', userData);
-        data = res.data; // Now this will have { token, user, message }
+        res = await axios.post('http://localhost:5000/api/auth/register', {
+          firstName, lastName, email, password, gender, dob
+        });
       } else {
-        const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-        data = res.data;
+        res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
       }
 
-      // Storing the token and user information in localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      data = res.data;
+      console.log("Login/Register response:", data);
+
+      // Store token + user in localStorage
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+
+        // If backend sends user info
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        } 
+        // If backend does NOT send user info
+        else {
+          const user = { email, password }; 
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+
+        console.log("User saved to localStorage:", JSON.parse(localStorage.getItem("user")));
+      }
 
       // Success callback
       onSuccess();
-      navigate('/dashboard'); //redirect to dashboard
-
+      navigate('/dashboard');
 
     } catch (error) {
       setError(error.response?.data?.error || 'An unexpected error occurred.');
@@ -93,7 +107,6 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
                   type="date"
                   value={dob}
                   onChange={(e) => setDob(e.target.value)}
-                  required
                 />
               </>
             )}

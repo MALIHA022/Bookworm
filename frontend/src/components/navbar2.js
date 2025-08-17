@@ -11,23 +11,17 @@ const Navbar2 = () => {
   const [modalOpen, setModalOpen] = useState(false);  // Track if modal is open
   const [postType, setPostType] = useState('');  // Track the post type (review, donate, sell)
   
-  const user = localStorage.getItem('user');
-  let parsedUser = null;  
-
-  // Ensure the user data exists and is a valid string before parsing
-  if (user) {
-    try {
-      parsedUser = JSON.parse(user);
-    } catch (error) {
-      console.error('Error parsing user data:', error);  // Handle parsing error
+  // Retrieve user info from localStorage
+  let user = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      user = JSON.parse(storedUser);
     }
-  } 
-
-  if (!parsedUser) {
-    console.log("No valid user data found in localStorage.");
-  } else {
-    console.log("User data:", parsedUser);  // Check what data is fetched
+  } catch (err) {
+    console.error("Error parsing user data:", err);
   }
+
   // Logout handler
   const handleLogout = () => {
     localStorage.removeItem('token');

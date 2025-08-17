@@ -1,5 +1,5 @@
 const express = require('express');
-const User = require('../models/User');  // Import the User model
+const User = require('../models/User'); 
 const router = express.Router();
 
 // Middleware for protecting routes that require authentication
@@ -8,7 +8,7 @@ const authenticate = require('../middleware/authenticate');
 // Get user profile
 router.get('/profile', authenticate, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);  // Assuming the user ID is stored in `req.user.id` after authentication
+    const user = await User.findById(req.user.id); 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
