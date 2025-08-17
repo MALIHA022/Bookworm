@@ -50,6 +50,18 @@ const PostCard = ({ post }) => {
     }
     localStorage.setItem('wishlistedPosts', JSON.stringify(savedWishlists)); // Save to localStorage
   };
+  
+  // Conditional rendering of the wishlist button based on the post type
+  const renderWishlistButton = () => {
+    if (post.type === 'sell' || post.type === 'donate') {
+      return (
+        <button onClick={() => setWishlisted(!wishlisted)}>
+          {wishlisted ? '📝' : '📃'}
+        </button>
+      );
+    }
+    return null; // Don't render Wishlist for 'review' posts
+  };
 
   return (
     <div className="bookpostcard">
@@ -68,11 +80,9 @@ const PostCard = ({ post }) => {
         </div>
         
         <div className="post-actions">
-            <button onClick={handleWishlist}>
-              {wishlisted ? '📝' : '📃'}
-            </button>
+            <button onClick={handleWishlist}>{renderWishlistButton()}</button>
             <button onClick={handleBookmark}>
-              {bookmarked ? '🔖 Bookmarked' : '💾 Bookmark'}
+              {bookmarked ? '🔖' : '💾'}
             </button>
             <button onClick={handleLike}>
               {liked ? '❤️' : '🤍'}

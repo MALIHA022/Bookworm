@@ -67,9 +67,6 @@ router.get('/user/:userId', authenticate, async (req, res) => {
   }
 });
 
-module.exports = router;
-
-
 
 // // like a post
 // router.post('/:id/like', async (req, res) => {
@@ -103,18 +100,26 @@ module.exports = router;
 //   }
 // });
 
-// // bookmark a post
-// router.post('/:id/bookmark', async (req, res) => {
-//   try {
-//     const post = await Post.findById(req.params.id);
-//     if (!post) return res.status(404).json({ error: 'Post not found' });
+// Get all wishlisted posts
+router.get('/wishlist', authenticate, async (req, res) => {
+  try {
+    const posts = await Post.find({ wishlisted: true }).populate('user', 'firstName lastName');
+    res.json(posts);  // Return the wishlisted posts
+  } catch (err) {
+    console.error('Error fetching wishlisted posts:', err);
+    res.status(500).json({ error: 'Error fetching wishlisted posts.' });
+  }
+});
 
-//     post.bookmarks += 1;
-//     const updatedPost = await post.save();
-//     res.json(updatedPost);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Failed to bookmark post' });
-//   }
-// });
 
-// module.exports = router;
+// Get all bookmarked posts
+router.get('/bookmarks', authenticate, async (req, res) => {
+  try {
+    const posts = await Post.find({ bookmarked: true }).populate('user', 'firstName lastName');
+    res.json(posts);  // Return the bookmarked posts
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching bookmarked posts.' });
+  }
+});
+
+module.exports = router;

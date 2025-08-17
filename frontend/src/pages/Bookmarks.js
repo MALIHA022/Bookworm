@@ -31,11 +31,11 @@ const Bookmarks = () => {
     <div className="bookmarks-page">
       <Navbar2 />
       <Sidebar />
-        <div className="bookmarks-container">
+        <div className="page-container">
           <div className="posts-section">
           <h2>Bookmarked Posts</h2>
             {bookmarkedPosts.length === 0 ? (
-              <p>No bookmarked posts yet.</p>
+              <p className='no-posts'>No bookmarked posts yet.</p>
             ) : (
               bookmarkedPosts.map(post => (
                 <PostCard key={post._id} post={post} />
