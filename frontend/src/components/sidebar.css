@@ -1,7 +1,7 @@
 .sidebar {
   width: 60px;
   height: 100vh;
-  background-color: #fff;
+  background-color: #fffafa;
   border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
 }
 
 .sidebar-icon.active {
-  background-color: #cceeff;
+  background-color: 	#ffcccc;
   border-radius: 50%;
   padding: 8px;
 }

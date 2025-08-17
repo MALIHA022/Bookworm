@@ -4,16 +4,25 @@ import Home from './pages/home';
 import Dashboard from './pages/Dashboard';
 import UserSettings from './pages/UserSettings';
 import Bookmarks from './pages/Bookmarks';
+import Wishlist from './pages/Wishlist';
 import ProtectedRoute from './components/ProtectedRoute';
+import Sidebar from './components/sidebar';
+import Navbar from './components/navbar2';
+
+import './App.css'; 
+
 
 const App = () => {
   return (
     <Router>  
+      <Sidebar />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/usersettings" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
         <Route path="/bookmarks" element={<ProtectedRoute><Bookmarks /></ProtectedRoute>} />
+        <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

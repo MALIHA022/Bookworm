@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 
 const Sidebar = () => {
   const links = [
-    { to: '/', icon: '🏠', label: 'Home' },
+    { to: '/dashboard', icon: '🏠', label: 'Home' },
     { to: '/explore', icon: '🔍', label: 'Explore' },
     { to: '/bookmarks', icon: '📖', label: 'Bookmarks' },
     { to: '/wishlist', icon: '📋', label: 'Wishlist' },
