@@ -11,7 +11,11 @@ const app = express();
 
 // Middleware setup
 app.use(express.json());  // For parsing JSON requests
-app.use(cors());  // Enable Cross-Origin Resource Sharing (CORS)
+app.use(cors({
+  origin: 'http://localhost:3000',  // Frontend URL
+  methods: ['GET', 'POST'],
+  credentials: true
+}));  // Enable Cross-Origin Resource Sharing (CORS)
 
 // MongoDB Connection
 const mongoURI = process.env.MONGO_URI;  // Access Mongo URI from .env file

@@ -1,12 +1,14 @@
 // components/PostCard.js
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import './postcards.css';
 
 const PostCard = ({ post }) => {
-  const [wishlisted, setWhishlisted] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
   const [bookmarked, setBookmarked] = useState(false);
+  const [wishlisted, setWishlisted] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
   
@@ -40,11 +42,11 @@ const PostCard = ({ post }) => {
     const savedWishlists = JSON.parse(localStorage.getItem('wishlistedPosts')) || [];
     if (!wishlisted) {
       savedWishlists.push(post._id);  // Add post to wishlisted list
-      setWhishlisted(true);
+      setWishlisted(true);
     } else {
       const index = savedWishlists.indexOf(post._id);
       savedWishlists.splice(index, 1);  // Remove post from wishlisted list
-      setWhishlisted(false);
+      setWishlisted(false);
     }
     localStorage.setItem('wishlistedPosts', JSON.stringify(savedWishlists)); // Save to localStorage
   };
@@ -52,7 +54,9 @@ const PostCard = ({ post }) => {
   return (
     <div className="bookpostcard">
         <div className='card-header'>
-            <h3>{post.title}</h3>
+          {/* posted by user {firstname lastname} */}
+          <h4> {post.user.firstName} {post.user.lastName}</h4>
+             <h3>Book Title: {post.title || post.bookTitle}</h3>
         </div>
         
         <div className='card-author'>
@@ -60,7 +64,7 @@ const PostCard = ({ post }) => {
         </div>
 
         <div className='card-content'>
-            <p>{post.content}</p>
+            <p>"{post.content || post.description}"</p>
         </div>
         
         <div className="post-actions">
