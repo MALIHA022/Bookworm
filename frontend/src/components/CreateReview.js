@@ -14,7 +14,7 @@ const CreateReview = ({ onPost, onClose }) => {
       return;
     }
 
-    const post = { title, author, content };
+    const post = { title, author, content , type: 'review' };
     onPost(post);  // Call the parent function to handle post creation
     setTitle('');
     setAuthor('');

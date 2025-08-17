@@ -1,46 +1,67 @@
 const express = require('express');
-const Post = require('../models/post');
-const authenticate = require('../middleware/authenticate');  // Middleware to verify user
+const Post = require('../models/Post');  // Ensure you have the correct import
+const authenticate = require('../middleware/authenticate');  // Authentication middleware
 const router = express.Router();
 
-// Create a post
+// Create a post (for review, donate, sell)
 router.post('/create', authenticate, async (req, res) => {
-  const { title, author, content } = req.body;
+  const { type, title, bookTitle, author, content, description, price } = req.body;
 
-  if (!title || !author || !content) {
-    return res.status(400).json({ error: 'All fields are required.' });
+  // Ensure type and author are provided
+  if (!type || !author) {
+    return res.status(400).json({ error: 'Type and author are required.' });
   }
 
+  // Additional validations based on post type
+  if (type === 'review' && (!title || !content)) {
+    return res.status(400).json({ error: 'Title and content are required for reviews.' });
+  }
+
+  if ((type === 'donate' || type === 'sell') && (!bookTitle || !description)) {
+    return res.status(400).json({ error: 'Book title and description are required for donate/sell posts.' });
+  }
+
+  if (type === 'sell' && !price) {
+    return res.status(400).json({ error: 'Price is required for sell posts.' });
+  }
+
+  // Create the new post
   const newPost = new Post({
-    title,
+    type,
+    title: title || null,
+    bookTitle: bookTitle || null,
     author,
-    content,
-    user: req.user.id,  // Use the logged-in user’s ID
+    content: content || null,
+    description: description || null,
+    price: price || null,
+    user: req.user.id,  // Associate the post with the authenticated user
   });
 
   try {
+    // Save the post in the database
     await newPost.save();
-    res.status(201).json(newPost);  // Return the created post
+    res.status(201).json(newPost);  // Return the created post as the response
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Error creating post.' });
   }
 });
 
-// Get all posts
+// Get all posts (for Dashboard)
 router.get('/', async (req, res) => {
   try {
-    const posts = await Post.find().populate('user', 'firstName lastName');  // Populate user data with their name
-    res.json(posts);
+    const posts = await Post.find().populate('user', 'firstName lastName');  // Populate user data
+    res.json(posts);  // Send posts to the frontend
   } catch (err) {
     res.status(500).json({ error: 'Error fetching posts.' });
   }
 });
 
-// Get posts by user
+// Get posts by user (for User Dashboard)
 router.get('/user/:userId', authenticate, async (req, res) => {
   try {
     const posts = await Post.find({ user: req.params.userId }).populate('user', 'firstName lastName');
-    res.json(posts);
+    res.json(posts);  // Return posts for the specified user
   } catch (err) {
     res.status(500).json({ error: 'Error fetching user posts.' });
   }

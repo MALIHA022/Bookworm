@@ -23,6 +23,10 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+//Import post routes
+const postRoutes = require('./routes/postRoutes');
+app.use('/api/posts', postRoutes);
+
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

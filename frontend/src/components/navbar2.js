@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './navbar.css';
 import CreateReview from './CreateReview';  // Review Post Modal
 import CreateDonate from './CreateDonate';  // Donate Post Modal
@@ -10,6 +11,7 @@ const Navbar2 = () => {
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);  // State for account dropdown
   const [modalOpen, setModalOpen] = useState(false);  // Track if modal is open
   const [postType, setPostType] = useState('');  // Track the post type (review, donate, sell)
+  const [posts, setPosts] = useState([]);  // State to hold posts
   
   // Retrieve user info from localStorage
   let user = null;
@@ -21,6 +23,19 @@ const Navbar2 = () => {
   } catch (err) {
     console.error("Error parsing user data:", err);
   }
+
+  // Fetch posts on load
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/posts');
+        setPosts(response.data);  // Set fetched posts to state
+      } catch (err) {
+        console.error('Error fetching posts:', err);
+      }
+    };
+    fetchPosts();
+  }, []);
 
   // Logout handler
   const handleLogout = () => {
@@ -54,10 +69,26 @@ const Navbar2 = () => {
   };
 
   // Handle post creation logic
-  const handlePostCreation = (post) => {
-    // Here you would handle the post creation, like sending it to the backend
-    console.log('Post created:', post);
-    closeModal(); // Close modal after posting
+  const handlePostCreation = async (postData) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You must be logged in to create a post.');
+      return;
+    } 
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/posts/create',
+        postData,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Update dashboard state
+      setPosts(prev => [response.data, ...prev]);
+      alert('Post created successfully!');
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || 'Failed to create post');
+    }
   };
 
   return (
