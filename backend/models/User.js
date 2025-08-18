@@ -10,7 +10,15 @@ const userSchema = new Schema({
     password: { type: String, required: true },
     gender: { type: String, enum: ['Male', 'Female'], required: true },
     dob: { type: Date, required: true },
-    favorites: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
+    likedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+    bookmarks: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+    wishlist: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+    reportedPosts: [{
+        post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+        reason: { type: String, required: true },
+        reportedAt: { type: Date, default: Date.now }
+    }],
+    notInterested: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
 });
 
 // Hash password
@@ -26,6 +34,4 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);  // Compare with the stored hashed password
 };
 
-
-// Export the model
 module.exports = mongoose.model('User', userSchema);
