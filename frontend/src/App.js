@@ -6,7 +6,6 @@ import UserSettings from './pages/UserSettings';
 import Bookmarks from './pages/Bookmarks';
 import Wishlisted from './pages/Wishlisted';
 import ProtectedRoute from './components/ProtectedRoute';
-import Sidebar from './components/sidebar';
 import Navbar from './components/navbar2';
 
 import './App.css'; 
@@ -15,7 +14,6 @@ import './App.css';
 const App = () => {
   return (
     <Router>  
-      <Sidebar />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
