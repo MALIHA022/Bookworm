@@ -1,39 +1,30 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/UserSettings.jsx
+import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import PostCard from '../components/postcards';
 import './UserSettings.css';
 
+import Sidebar from '../components/sidebar';
+
+import FetchUser from './fetchUser';
+import FetchPost from './fetchPost';
+
 const UserSettings = () => {
-  const [userPosts, setUserPosts] = useState([]);
-  const [error, setError] = useState(null);
-
-  const userId = JSON.parse(localStorage.getItem('user'))._id;  // Get logged-in user's ID from localStorage
-
-  useEffect(() => {
-    const fetchUserPosts = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/posts/user/${userId}`);
-        setUserPosts(response.data);  // Store user’s posts in state
-      } catch (err) {
-        setError('Error fetching your posts.');
-      }
-    };
-    fetchUserPosts();
-  }, [userId]);
+    const [error, setError] = useState('');
 
   return (
-    <div className="settings-container">
-      <h2>Your Posts</h2>
-      {error && <p>{error}</p>}
-      {userPosts.length === 0 ? (
-        <p>You haven’t posted anything yet.</p>
-      ) : (
-        userPosts.map(post => (
-          <PostCard key={post._id} post={post} />
-        ))
-      )}
+    <div className="settings-grid">
+      <Sidebar />
+      <section className="profile-pane">
+        <h2>Profile</h2>
+        <div className="profile-card">
+          <FetchUser />
+        </div>
+      </section>
+
+      <section className="posts-pane">
+        <FetchPost />
+      </section>
     </div>
   );
-};
-
+}
 export default UserSettings;

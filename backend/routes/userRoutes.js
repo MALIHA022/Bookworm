@@ -1,8 +1,6 @@
 const express = require('express');
 const User = require('../models/User'); 
 const router = express.Router();
-
-// Middleware for protecting routes that require authentication
 const authenticate = require('../middleware/authenticate');
 
 // Get user profile
@@ -77,6 +75,20 @@ router.put('/update-password', authenticate, async (req, res) => {
     res.json({ message: 'Password updated successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get current user's posts
+router.get('/posts', authenticate, async (req, res) => {
+  try {
+    const posts = await Post.find({ user: req.user.id })
+    .sort({ createdAt: -1 })
+    .populate('user', 'firstName lastName')
+    .lean();
+    res.json({ posts });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Failed to fetch user posts' });
   }
 });
 
