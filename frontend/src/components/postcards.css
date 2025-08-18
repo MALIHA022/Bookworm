@@ -6,7 +6,8 @@
 }
 
 .bookpostcard {
-    background-color:#ccfff475;
+    /* background-color:#ccfff475; */
+    background-color: #e8c0a9;
     padding: 20px;
     margin: 10px;
     width: 65%; 
@@ -50,7 +51,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 25px;
 }
 
 .more-menu {
@@ -81,4 +82,23 @@
   border: none;
   background: #fff7fc1a;
   cursor: pointer;
+}
+
+.pill { 
+  font-size:12px; 
+  border-radius:8px; 
+  padding:2px 8px; 
+  margin-right:8px; 
+}
+
+.pill-review { 
+  background:#85b4f7; 
+} 
+
+.pill-donate { 
+  background:#ff4bf3; 
+} 
+
+.pill-sell { 
+  background:#3af980; 
 }

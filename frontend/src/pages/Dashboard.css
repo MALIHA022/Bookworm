@@ -1,12 +1,14 @@
 .dashboard-container {
   display: flex;
-  height: 100vh;
+  height: 100%;
   flex-direction: column; 
+  background-color: #fbeddf;
 }
 
 .page-container {
+  background-color: #fbeddf;
   display: flex;
-  height: 100vh;
+  height: 100%;
   margin-top: 20px;
   flex-direction: column; 
 }

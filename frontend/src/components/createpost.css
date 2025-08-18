@@ -3,7 +3,7 @@
   max-width: 500px;
   margin: 20px auto;
   padding: 20px;
-  background: white;
+  background: #e4d9d1;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.05);
   display: flex;
@@ -20,12 +20,12 @@
   margin-bottom: 12px;
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #fcf1df;
   font-size: 16px;
 }
 
 .book-post-form button {
-  background-color: #0077cc;
+  background-color: #7f3202;
   color: white;
   border: none;
   padding: 10px;
@@ -34,7 +34,7 @@
 }
 
 .book-post-form button:hover {
-  background-color: #005fa3;
+  background-color: #5e2502;
 }
 
 
