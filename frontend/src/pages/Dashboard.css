@@ -13,6 +13,22 @@
   flex-direction: column; 
 }
 
+.dashboard-posts-section {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  flex-grow: 1;
+  padding: 10px;
+  margin-top: 75px;
+  left: 60px;
+}
+
+.dashboard-posts-section .no-posts {
+  margin: 5px 0;
+  color: #ff3333;
+}
+
 .posts-section {
   position: relative;
   display: flex;

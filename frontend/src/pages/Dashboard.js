@@ -9,7 +9,6 @@ import PostCard from '../components/postcards';
 import CreateDonate from '../components/CreateDonate';
 import CreateSell from '../components/CreateSell';
 import CreateReview from '../components/CreateReview';
-import { set } from 'mongoose';
 
 const Dashboard = () => {
   const [posts, setPosts] = useState([]);
@@ -97,7 +96,7 @@ const Dashboard = () => {
         { loading ? (
           <p>Loading posts...</p>  // Show a loading message while fetching
         ) : (
-        <div className="posts-section">
+        <div className="dashboard-posts-section">
           {posts.length === 0 ? (
             <p>No posts available.</p>  // Display message if there are no posts
           ) : (
