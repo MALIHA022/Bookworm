@@ -92,4 +92,35 @@ router.get('/posts', authenticate, async (req, res) => {
   }
 });
 
+router.put('/profile', authenticate, async (req, res) => {
+  try {
+    const updates = {};
+    ['firstName', 'lastName', 'email', 'gender', 'dob'].forEach(k => {
+      if (req.body[k] !== undefined) updates[k] = req.body[k];
+    });
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updates },
+      { new: true }
+    ).lean();
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        gender: user.gender,
+        dob: user.dob
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;

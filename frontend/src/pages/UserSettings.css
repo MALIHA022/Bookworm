@@ -114,3 +114,75 @@
   color:#9ca3af; 
   padding:12px; 
 }
+
+
+/*  */
+.edit-grid { 
+  display: grid; 
+  gap: 8px; 
+  grid-template-columns: 1fr 1fr; 
+}
+
+.edit-grid label { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+}
+.edit-form {
+  display: flex;
+  flex-direction: column;
+}
+.error {
+  color: red;
+}
+
+.edit-form input,
+.edit-form textarea{
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.edit-form select {
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ffe4c6;
+  font-size: 16px;
+}
+
+.edit-form select option {
+  padding: 10px;
+  font-size: 15px;
+}
+.actions { 
+  margin-top: 8px; 
+  display: flex; 
+  gap: 8px; 
+  justify-content: flex-end;
+}
+
+.posts button.danger { 
+  background: #c62828; 
+  color: #fff; 
+}
+button.secondary { 
+  background: #eee; 
+}
+
+
+.profile-card button,
+.posts button {
+  background-color: #926548;
+  color: white;
+  border: 2px solid #5b2f12;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.profile-card button:hover,
+.posts button:hover {
+  background-color: #52290e;
+}

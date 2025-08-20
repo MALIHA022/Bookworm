@@ -4,11 +4,12 @@ const bcrypt = require('bcryptjs');
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    gender: { type: String, enum: ['Male', 'Female'], required: true },
+    gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
     dob: { type: Date, required: true },
     likedPosts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
     bookmarks: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
