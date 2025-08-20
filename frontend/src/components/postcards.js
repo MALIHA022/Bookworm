@@ -66,7 +66,6 @@ const PostCard = ({ post }) => {
   return (
     <div className="bookpostcard">
         <div className='card-header'>
-          {/* posted by user {firstname lastname} */}
           <span className={`pill pill-${post.type}`}>{post.type}</span>
           <h4> {post.user.firstName} {post.user.lastName}</h4>
              <h3>Book Title: {post.title || post.bookTitle}</h3>

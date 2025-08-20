@@ -60,22 +60,23 @@
   padding:12px; 
 }
 
-.pill { 
+.pilltype { 
   font-size:12px; 
   border-radius:8px; 
   padding:2px 8px; 
   margin-right:8px; 
+  border: 1px solid #374151;
 }
 
-.pill-review { 
+.pilltype-review { 
   background:#93b7ea; 
 } 
 
-.pill-donate { 
+.pilltype-donate { 
   background:#2563eb; 
 } 
 
-.pill-sell { 
+.pilltype-sell { 
   background:#16a34a; 
 }
 

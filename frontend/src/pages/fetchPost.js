@@ -61,7 +61,7 @@ export default function FetchUser() {
             {posts.map(p => (
               <li key={p._id} className="post-item">
                 <div className="meta">
-                  <span className={`pill pill-${p.type}`}>{p.type}</span>
+                  <span className={`pilltype pilltype-${p.type}`}>{p.type}</span>
                   <span className="date">{new Date(p.createdAt).toLocaleString()}</span>
                 </div>
                 <h3 className="title">

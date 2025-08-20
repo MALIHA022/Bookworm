@@ -25,10 +25,8 @@
   background-color: #fef1f7;
   display: flex;
   justify-content: center;
-  /* gap: 1.5rem; */
   padding: 1rem;
   background: #eee;
-  /* margin-top: 30px; */
   text-align: center;
 }
 .cover-footer a {
