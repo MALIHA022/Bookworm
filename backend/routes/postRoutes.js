@@ -122,4 +122,90 @@ router.get('/bookmarks', authenticate, async (req, res) => {
   }
 });
 
-module.exports = router;
+// Edit a post (owner or admin)
+router.put('/:id', authenticate, async (req, res) => {
+  try {
+    // Find the post by ID
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Check if the authenticated user owns the post or is an admin
+    const isOwner = post.user?.toString() === req.user.id;
+    const isAdmin = req.user.role === 'admin'; // Assuming you have a 'role' field in User schema
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Not allowed to edit this post' });
+    }
+
+    // Validate and update the post fields
+    const { type, title, bookTitle, author, content, description, price } = req.body;
+    
+    if (!type || !author) {
+      return res.status(400).json({ error: 'Type and author are required.' });
+    }
+
+    // Additional validation for specific types
+    if (type === 'review' && (!title || !content)) {
+      return res.status(400).json({ error: 'Title and content are required for reviews.' });
+    }
+
+    if ((type === 'donate' || type === 'sell') && (!bookTitle || !description)) {
+      return res.status(400).json({ error: 'Book title and description are required for donate/sell posts.' });
+    }
+
+    if (type === 'sell' && !price) {
+      return res.status(400).json({ error: 'Price is required for sell posts.' });
+    }
+
+    // Update the post
+    post.type = type;
+    post.title = title || null;
+    post.bookTitle = bookTitle || null;
+    post.author = author;
+    post.content = content || null;
+    post.description = description || null;
+    post.price = price || null;
+
+    // Save the updated post
+    await post.save();
+    res.json(post);  // Return the updated post
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating post.' });
+  }
+});
+
+
+
+// Delete a post (owner or admin)
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    // Find the post by ID
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    // Check if the authenticated user owns the post or is an admin
+    const isOwner = post.user?.toString() === req.user.id;
+    const isAdmin = req.user.role === 'admin'; // Assuming you have a 'role' field in User schema
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ error: 'Not allowed to delete this post' });
+    }
+
+    // Remove the post
+    await Post.deleteOne({ _id: post._id });
+
+    // OPTIONAL: Cleanup User's bookmarks, wishlist, and likedPosts arrays
+    const postId = post._id;
+    await User.updateMany({}, { $pull: { bookmarks: postId, wishlist: postId, likedPosts: postId } });
+
+    res.json({ message: 'Post deleted successfully', postId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error deleting post.' });
+  }
+});
+
