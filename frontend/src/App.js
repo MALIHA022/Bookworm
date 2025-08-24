@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import UserSettings from './pages/UserSettings';
 import Bookmarks from './pages/Bookmarks';
 import Wishlisted from './pages/Wishlisted';
+import Explore from './pages/Explore';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/navbar2';
 
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/usersettings" element={<ProtectedRoute><UserSettings /></ProtectedRoute>} />
         <Route path="/bookmarks" element={<ProtectedRoute><Bookmarks /></ProtectedRoute>} />
         <Route path="/wishlist" element={<ProtectedRoute><Wishlisted /></ProtectedRoute>} />
+        <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
       </Routes>
     </Router>
   );
