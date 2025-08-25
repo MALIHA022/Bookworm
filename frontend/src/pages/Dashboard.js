@@ -62,13 +62,6 @@ const Dashboard = () => {
       <Sidebar />
       <div className="main-content">
         <Navbar2 />
-
-        <div className="post-buttons">
-          <button onClick={() => setShowDonateModal(true)}>Create Donate Post</button>
-          <button onClick={() => setShowSellModal(true)}>Create Sell Post</button>
-          <button onClick={() => setShowReviewModal(true)}>Create Review Post</button>
-        </div>
-
         {showDonateModal && (
           <CreateDonate
           onPost={handleCreatePost}

@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './navbar.css';
-import CreateReview from './CreateReview'; 
-import CreateDonate from './CreateDonate'; 
-import CreateSell from './CreateSell';  
-import './createpost.css'
 
-const Navbar2 = () => {
-  const [showPlusDropdown, setShowPlusDropdown] = useState(false);  
+// import './createpost.css'
+
+const NavbarAdmin = () => {
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);  
   const [modalOpen, setModalOpen] = useState(false);
   const [postType, setPostType] = useState('');  
@@ -56,16 +53,9 @@ const Navbar2 = () => {
     setPostType('');
   };
 
-  // Toggle plus icon dropdown
-  const togglePlusDropdown = () => {
-    setShowPlusDropdown(!showPlusDropdown);
-    setShowAccountDropdown(false);  
-  };
-
   // Toggle account dropdown
   const toggleAccountDropdown = () => {
     setShowAccountDropdown(!showAccountDropdown);
-    setShowPlusDropdown(false);
   };
 
   // Handle post creation logic
@@ -98,17 +88,16 @@ const Navbar2 = () => {
         <div className="navbar-title">BookWorm</div>
       </div>
       <div className="navbar-right">
-        <input type="text" placeholder="Search books..." className="search-bar" />
         
         <div className="plus-icon-dropdown">
-          <button className="plus-icon" onClick={togglePlusDropdown}>➕</button>
-          {showPlusDropdown && (
+          {/* <button className="plus-icon" onClick={togglePlusDropdown}>➕</button> */}
+          {/* {showPlusDropdown && (
             <div className="dropdown-menu-plus">
               <button onClick={() => openModal('review')}>Review</button>
               <button onClick={() => openModal('donate')}>Donate</button>
               <button onClick={() => openModal('sell')}>Sell</button>
             </div>
-          )}
+          )} */}
         </div>
 
         <span className="icon">🔔</span>
@@ -126,20 +115,8 @@ const Navbar2 = () => {
           )}
         </div>
       </div>
-
-      {modalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button className="close-btn" onClick={closeModal}>❌</button>
-
-            {postType === 'review' && <CreateReview onPost={handlePostCreation} onClose={closeModal} />}
-            {postType === 'donate' && <CreateDonate onPost={handlePostCreation} onClose={closeModal} />}
-            {postType === 'sell' && <CreateSell onPost={handlePostCreation} onClose={closeModal} />}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-export default Navbar2;
+export default NavbarAdmin;
