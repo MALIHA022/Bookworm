@@ -17,6 +17,13 @@
     flex-direction: column;
 }
 
+.card-body {
+  background-color: #d7ae97;
+  border-radius: 12px;
+  padding: 5px;
+  margin: 10px;
+}
+
 .card-header {
   font-weight: bold;
   font-size: 18px;
@@ -28,9 +35,16 @@
   margin-bottom: 4px;
 }
 
+.card-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  margin-left: 10px;
+}
+
 .card-author {
   color: #555;
   margin-bottom: 10px;
+  margin-left: 20px;
 }
 
 .card-content {
@@ -38,6 +52,8 @@
   font-size: 14px;
   color: #333;
   margin-bottom: 12px;
+  margin-left: 30px;
+  margin-right: 10px;
 }
 
 .post-actions {
@@ -51,7 +67,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 .more-menu {

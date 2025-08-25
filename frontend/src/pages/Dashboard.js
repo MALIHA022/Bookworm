@@ -58,47 +58,47 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <Sidebar />
-      <div className="main-content">
+    <div className="dashboard-grid">
+        <Sidebar />
         <Navbar2 />
-        {showDonateModal && (
-          <CreateDonate
-          onPost={handleCreatePost}
-          onClose={() => setShowDonateModal(false)}
-          />
-        )}
-
-        {showSellModal && (
-          <CreateSell
+      <div className="dashboard-container">
+          {showDonateModal && (
+            <CreateDonate
             onPost={handleCreatePost}
-            onClose={() => setShowSellModal(false)}
-          />
-        )}
-
-        {showReviewModal && (
-          <CreateReview
-            onPost={handleCreatePost}
-            onClose={() => setShowReviewModal(false)}
+            onClose={() => setShowDonateModal(false)}
             />
-        )}
-
-        {error && <div className="error-message">{error}</div>}
-
-        {/* Posts Section */}
-        { loading ? (
-          <p>Loading posts...</p>  // Show a loading message while fetching
-        ) : (
-        <div className="dashboard-posts-section">
-          {posts.length === 0 ? (
-            <p>No posts available.</p>  // Display message if there are no posts
-          ) : (
-            posts.map((post) => (
-              <PostCard key={post._id} post={post} />  // Display each post as a PostCard
-            ))
           )}
-        </div>
-        )}
+
+          {showSellModal && (
+            <CreateSell
+              onPost={handleCreatePost}
+              onClose={() => setShowSellModal(false)}
+            />
+          )}
+
+          {showReviewModal && (
+            <CreateReview
+              onPost={handleCreatePost}
+              onClose={() => setShowReviewModal(false)}
+              />
+          )}
+
+          {error && <div className="error-message">{error}</div>}
+
+          {/* Posts Section */}
+          { loading ? (
+            <p>Loading posts...</p>  // Show a loading message while fetching
+          ) : (
+          <div className="dashboard-posts-section">
+            {posts.length === 0 ? (
+              <p>No posts available.</p>  // Display message if there are no posts
+            ) : (
+              posts.map((post) => (
+                <PostCard key={post._id} post={post} />  // Display each post as a PostCard
+              ))
+            )}
+          </div>
+          )}
       </div>
     </div>
   );

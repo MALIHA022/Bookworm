@@ -65,24 +65,28 @@ const PostCard = ({ post }) => {
 
   return (
     <div className="bookpostcard">
-        <div className='card-header'>
-          <span className={`pill pill-${post.type}`}>{post.type}</span>
-          <h4> {post.user.firstName} {post.user.lastName}</h4>
-             <h3>Book Title: {post.title || post.bookTitle}</h3>
-        </div>
-        
-        <div className='card-author'>
-            <p><strong>Author:</strong> {post.author}</p>
+          <div className='card-header'>
+            <span className={`pill pill-${post.type}`}>{post.type}</span>
+            <h4> {post.user.firstName} {post.user.lastName}</h4>
+          </div>
+
+        <div className='card-body'>
+          <div className='card-title'>
+            <h3>Book Title: {post.title || post.bookTitle}</h3>
+          </div>
+          <div className='card-author'>
+              <p><strong>Author:</strong> {post.author}</p>
+          </div>
+
+          <div className='card-content'>
+              <p>"{post.content || post.description}"</p>
+          </div>
         </div>
 
-        <div className='card-content'>
-            <p>"{post.content || post.description}"</p>
-        </div>
-        
         <div className="post-actions">
             <button onClick={handleWishlist}>{renderWishlistButton()}</button>
             <button onClick={handleBookmark}>
-              {bookmarked ? '🔖' : '💾'}
+              {bookmarked ? '🌟' : '⭐'}
             </button>
             <button onClick={handleLike}>
               {liked ? '❤️' : '🤍'}

@@ -23,5 +23,36 @@
 .sidebar-icon.active {
   background-color: 		#c9b2a3;
   border-radius: 50%;
-  padding: 8px;
+  padding: 4px;
+}
+
+
+.sidebar-admin {
+  width: 60px;
+  height: 100vh;
+  background-color: 	#e4d9d1;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  bottom: 0;
+}
+
+
+.admin-icon {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin: 20px 0;
+  font-size: 15px;
+  color: #555;
+  text-decoration: none;
+}
+
+.admin-icon.active {
+  background-color: 		#c9b2a3;
+  border-radius: 30%;
+  padding: 4px;
 }

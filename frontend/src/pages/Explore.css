@@ -1,9 +1,10 @@
 .explore-container { 
     display: flex; 
     padding: 1rem; 
-    max-width: 100%; 
+    max-width: 90%; 
     height: 100%; 
-    margin: 80px auto; 
+    margin-top: 80px;
+    margin-left: 30px; 
 }
 
 .explore-section {
@@ -18,8 +19,7 @@
     align-items: center; 
     justify-content: space-between; 
     margin-bottom: 1rem; 
-    padding-left: 20px; 
-    padding-right: 100px; 
+    padding-left: 20px;  
     max-width: 100%; 
 }
 
@@ -47,9 +47,14 @@
 }
 
 .cards { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-    gap: 1rem; 
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    justify-items: stretch;
+    align-content: stretch;
+    justify-content: space-evenly;
+    align-items: stretch;
+    margin: 10px;
 }
 .card { 
     background: #ffe2cf; 
@@ -57,6 +62,13 @@
     border-radius: 14px; 
     padding: 1rem; 
 }
+
+.card:hover { 
+    box-shadow: 0 4px 8px #2512031a; 
+    transform: translateY(-4px); 
+    transition: all 0.2s ease-in-out; 
+}
+
 .card-head { 
     display: flex; 
     align-items: center; 
