@@ -19,7 +19,9 @@ const userSchema = new Schema({
         reason: { type: String, required: true },
         reportedAt: { type: Date, default: Date.now }
     }],
-    notInterested: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }]
+    notInterested: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+    status: { type: String, enum: ['active', 'suspended'], default: 'active' },
+    warnings: [{ message: String, at: { type: Date, default: Date.now } }],
 });
 
 // Hash password

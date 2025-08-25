@@ -1,5 +1,6 @@
 //jwt verification, handle user role authorization
 
+module.exports = require('./authenticate');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
 
