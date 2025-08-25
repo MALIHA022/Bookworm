@@ -1,18 +1,17 @@
 const express = require('express');
-const Post = require('../models/Post');  // Ensure you have the correct import
-const authenticate = require('../middleware/authenticate');  // Authentication middleware
+const Post = require('../models/Post'); 
+const Report = require('../models/Reports');
+const authenticate = require('../middleware/authenticate');  
 const router = express.Router();
 
 // Create a post (for review, donate, sell)
 router.post('/create', authenticate, async (req, res) => {
   const { type, title, bookTitle, author, content, description, price } = req.body;
 
-  // Ensure type and author are provided
   if (!type || !author) {
     return res.status(400).json({ error: 'Type and author are required.' });
   }
 
-  // Additional validations based on post type
   if (type === 'review' && (!title || !content)) {
     return res.status(400).json({ error: 'Title and content are required for reviews.' });
   }
@@ -38,9 +37,8 @@ router.post('/create', authenticate, async (req, res) => {
   });
 
   try {
-    // Save the post in the database
     await newPost.save();
-    res.status(201).json(newPost);  // Return the created post as the response
+    res.status(201).json(newPost); 
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error creating post.' });
@@ -50,8 +48,8 @@ router.post('/create', authenticate, async (req, res) => {
 // Get all posts (for Dashboard)
 router.get('/', async (req, res) => {
   try {
-    const posts = await Post.find().populate('user', 'firstName lastName');  // Populate user data
-    res.json(posts);  // Send posts to the frontend
+    const posts = await Post.find().populate('user', 'firstName lastName');
+    res.json(posts);
   } catch (err) {
     res.status(500).json({ error: 'Error fetching posts.' });
   }
@@ -104,7 +102,7 @@ router.get('/user/:userId', authenticate, async (req, res) => {
 router.get('/wishlist', authenticate, async (req, res) => {
   try {
     const posts = await Post.find({ wishlisted: true }).populate('user', 'firstName lastName');
-    res.json(posts);  // Return the wishlisted posts
+    res.json(posts);  
   } catch (err) {
     console.error('Error fetching wishlisted posts:', err);
     res.status(500).json({ error: 'Error fetching wishlisted posts.' });
@@ -116,7 +114,7 @@ router.get('/wishlist', authenticate, async (req, res) => {
 router.get('/bookmarks', authenticate, async (req, res) => {
   try {
     const posts = await Post.find({ bookmarked: true }).populate('user', 'firstName lastName');
-    res.json(posts);  // Return the bookmarked posts
+    res.json(posts);
   } catch (err) {
     res.status(500).json({ error: 'Error fetching bookmarked posts.' });
   }
@@ -125,7 +123,6 @@ router.get('/bookmarks', authenticate, async (req, res) => {
 // Edit a post (owner or admin)
 router.put('/:id', authenticate, async (req, res) => {
   try {
-    // Find the post by ID
     const post = await Post.findById(req.params.id);
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
@@ -133,20 +130,18 @@ router.put('/:id', authenticate, async (req, res) => {
 
     // Check if the authenticated user owns the post or is an admin
     const isOwner = post.user?.toString() === req.user.id;
-    const isAdmin = req.user.role === 'admin'; // Assuming you have a 'role' field in User schema
+    const isAdmin = req.user.role === 'admin';
 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ error: 'Not allowed to edit this post' });
     }
 
-    // Validate and update the post fields
     const { type, title, bookTitle, author, content, description, price } = req.body;
     
     if (!type || !author) {
       return res.status(400).json({ error: 'Type and author are required.' });
     }
 
-    // Additional validation for specific types
     if (type === 'review' && (!title || !content)) {
       return res.status(400).json({ error: 'Title and content are required for reviews.' });
     }
@@ -168,9 +163,8 @@ router.put('/:id', authenticate, async (req, res) => {
     post.description = description || null;
     post.price = price || null;
 
-    // Save the updated post
     await post.save();
-    res.json(post);  // Return the updated post
+    res.json(post);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error updating post.' });
@@ -207,6 +201,25 @@ router.delete('/:id', authenticate, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Error deleting post.' });
   }
+});
+
+
+
+// User reports a post
+router.post('/:id/report', authenticate, async (req, res) => {
+  const { reason } = req.body;
+  if (!reason) return res.status(400).json({ error: 'Reason is required' });
+
+  const post = await Post.findById(req.params.id);
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+
+  const report = await Report.create({
+    post: post._id,
+    reportedBy: req.user.id,
+    reason,
+  });
+
+  res.status(201).json({ message: 'Reported', report });
 });
 
 module.exports = router;
