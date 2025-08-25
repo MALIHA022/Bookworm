@@ -1,28 +1,31 @@
-// src/pages/AdminDashboard.jsx
+// src/pages/AdminDashboard.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
 import NavbarAdmin from '../components/navbarAdmin';
-
-import './Dashboard.css'
+import './Dashboard.css';
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState({});
   const [reports, setReports] = useState([]);
-  const auth = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
+
+  const getAuth = () => ({
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+  });
 
   useEffect(() => {
     const load = async () => {
-      const m = await axios.get('http://localhost:5000/api/admin/metrics', auth);
+      const m = await axios.get('http://localhost:5000/api/admin/metrics', getAuth());
       setMetrics(m.data);
-      const r = await axios.get('http://localhost:5000/api/admin/reports?status=pending', auth);
+
+      // This will 404 unless you add the routes above
+      const r = await axios.get('http://localhost:5000/api/admin/reports?status=pending', getAuth());
       setReports(r.data);
     };
     load();
   }, []);
 
   const actionReport = async (id, status, feedback='') => {
-    await axios.patch(`http://localhost:5000/api/admin/reports/${id}`, { status, feedback }, auth);
+    await axios.patch(`http://localhost:5000/api/admin/reports/${id}`, { status, feedback }, getAuth());
     setReports(prev => prev.filter(r => r._id !== id));
   };
 
@@ -31,7 +34,6 @@ export default function AdminDashboard() {
       <NavbarAdmin />
       <h2>Admin Dashboard</h2>
       <div className='main-content'>
-
         <div className="dashboard-metrics">
           <div>📣 Total Reports: <b>{metrics.totalReports ?? '-'}</b></div>
           <div>⏳ Pending Reports: <b>{metrics.pendingReports ?? '-'}</b></div>

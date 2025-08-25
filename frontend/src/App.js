@@ -10,7 +10,7 @@ import Explore from './pages/Explore';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/navbar2';
-import AdminRoute from './components/AdminRoutes'
+import AdminRoute from './components/adminRoute'
 
 import './App.css'; 
 
