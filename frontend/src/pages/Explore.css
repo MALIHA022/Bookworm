@@ -27,6 +27,13 @@
     display: inline-flex; 
     gap: .5rem; 
 }
+
+.toggle button{
+    color: #311a0a;
+    padding: 10px;
+    margin: 2px;
+}
+
 .toggle-btn { 
     padding: .5rem .9rem; 
     border: 2px solid #d7d7d7; 

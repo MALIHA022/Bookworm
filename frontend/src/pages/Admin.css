@@ -49,7 +49,7 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-button{
+.searchbar button{
   background-color: #7f3202;
   color: white;
   border: none;
@@ -59,6 +59,11 @@ button{
   cursor: pointer;
 }
 
+.searchbar button:hover{
+  background-color: #532101;
+}
+
+
 .page-buttons button{
     background-color: #ffff;
     border: 1px solid #541902;
@@ -66,6 +71,12 @@ button{
     padding: 3px;
     border-radius: 6px;
     cursor: pointer;
+}
+
+.page-buttons button:hover{
+    background-color: #5a1b02;
+    border: 1px solid #5a1b02;
+    color: #fcf3f0;    
 }
 
 .searchbar{
