@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  height: 100%;
+  flex-direction: column; 
+  margin-top: 80px;
+  margin-left: 80px;
+}
+
+.page-container {
+  display: flex;
+  height: 100%;
+  margin-top: 20px;
+  flex-direction: column; 
+}
+
+.dashboard-posts-section {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.dashboard-posts-section .no-posts {
+  margin: 5px 0;
+  color: #ff3333;
+}
+
+.posts-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  padding: 10px;
+  margin-top: 75px;
+  left: 60px;
+}
+
+.posts-section .no-posts {
+  margin: 5px 0;
+  color: #ff3333;
+}
+
+.dashboard-metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+button{
+  background-color: #7f3202;
+  color: white;
+  border: none;
+  padding: 7px;
+  margin: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.page-buttons button{
+    background-color: #ffff;
+    border: 1px solid #541902;
+    color: #541902;
+    padding: 3px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.searchbar{
+    display: flex;
+    gap:8px; 
+    margin-bottom:12px;
+    justify-content: space-around;
+}
+
+.inputarea{
+    padding: 5px;
+    border-radius:6px;
+    border:1px solid #ddd;
+    width: 1200px;
+}

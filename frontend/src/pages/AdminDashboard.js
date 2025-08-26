@@ -7,7 +7,7 @@ import './Dashboard.css';
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState({});
-  const [reports, setReports] = useState([]);
+  // const [reports, setReports] = useState([]);
 
   const getAuth = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -18,17 +18,17 @@ export default function AdminDashboard() {
       const m = await axios.get('http://localhost:5000/api/admin/metrics', getAuth());
       setMetrics(m.data);
 
-      // This will 404 unless you add the routes above
-      const r = await axios.get('http://localhost:5000/api/admin/reports?status=pending', getAuth());
-      setReports(r.data);
+      // // This will 404 unless you add the routes above
+      // const r = await axios.get('http://localhost:5000/api/admin/reports?status=pending', getAuth());
+      // setReports(r.data);
     };
     load();
   }, []);
 
-  const actionReport = async (id, status, feedback='') => {
-    await axios.patch(`http://localhost:5000/api/admin/reports/${id}`, { status, feedback }, getAuth());
-    setReports(prev => prev.filter(r => r._id !== id));
-  };
+  // const actionReport = async (id, status, feedback='') => {
+  //   await axios.patch(`http://localhost:5000/api/admin/reports/${id}`, { status, feedback }, getAuth());
+  //   setReports(prev => prev.filter(r => r._id !== id));
+  // };
 
   return (
     <div className="admin-dashboard-grid">
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
           </div>
 
           <h3 style={{ marginTop: 24 }}>Pending Reports</h3>
-          {reports.map(r => (
+          {/* {reports.map(r => (
             <div key={r._id} style={{ border:'1px solid #ddd', padding:12, borderRadius:8, marginBottom:12 }}>
               <div><b>Post:</b> {r.post?.title || r.post?.bookTitle} <i>({r.post?.type})</i></div>
               <div><b>Reason:</b> {r.reason}</div>
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
                 <button onClick={() => actionReport(r._id, 'dismissed', 'Not a violation')}>Dismiss</button>
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
     </div>

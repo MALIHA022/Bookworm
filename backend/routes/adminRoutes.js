@@ -61,4 +61,50 @@ router.patch('/reports/:id', authenticate, requireAdmin, async (req, res) => {
   res.json(updated);
 });
 
+// List users 
+router.get('/users', authenticate, requireAdmin, async (req, res) => {
+  const q = (req.query.q || '').trim().toLowerCase();
+  const page = Math.max(parseInt(req.query.page || '1', 10), 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit || '20', 10), 1), 100);
+  const skip = (page - 1) * limit;
+
+  const filter = { role: { $ne: 'admin' } };
+  if (q) {
+    filter.$or = [
+      { firstName: { $regex: q, $options: 'i' } },
+      { lastName:  { $regex: q, $options: 'i' } },
+      { email:     { $regex: q, $options: 'i' } },
+    ];
+  }
+
+  const [users, total] = await Promise.all([
+    User.find(filter)
+      .select('firstName lastName email role gender dob status createdAt')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    User.countDocuments(filter),
+  ]);
+
+  res.json({
+    users,
+    page,
+    limit,
+    total,
+    pages: Math.ceil(total / limit),
+  });
+});
+
+//see all posts
+router.get('/', async (req, res) => {
+  try {
+    const posts = await Post.find().populate('user', 'firstName lastName');
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching posts.' });
+  }
+});
+
+
 module.exports = router;
