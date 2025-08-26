@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './postcards.css';
+import './modal.css';
 
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
@@ -10,6 +11,9 @@ const PostCard = ({ post }) => {
   const [bookmarked, setBookmarked] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+
 
   
   useEffect(() => {
@@ -63,6 +67,26 @@ const PostCard = ({ post }) => {
     return null; // Don't render Wishlist for 'review' posts
   };
 
+
+  // Submit report
+  const handleReportSubmit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/api/reports", {
+        postId: post._id,
+        reason: reportReason
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Report submitted successfully");
+      setShowReportModal(false);
+      setReportReason("");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit report");
+    }
+  };
+
   return (
     <div className="bookpostcard">
           <div className='card-header'>
@@ -86,7 +110,7 @@ const PostCard = ({ post }) => {
         <div className="post-actions">
             <button onClick={handleWishlist}>{renderWishlistButton()}</button>
             <button onClick={handleBookmark}>
-              {bookmarked ? '🌟' : '⭐'}
+              {bookmarked ? '⭐' : '✰'}
             </button>
             <button onClick={handleLike}>
               {liked ? '❤️' : '🤍'}
@@ -95,14 +119,32 @@ const PostCard = ({ post }) => {
                   <button onClick={() => setShowDropdown(!showDropdown)}>⋮</button>
                   {showDropdown && (
                   <div className="dropdown">
-                      <button>🚫 Report</button>
-                      <button>🙅 Not Interested</button>
+                    <button onClick={() => setShowReportModal(true)}>🚫 Report</button>
+                    <button>🙅 Not Interested</button>
                   </div>
                   )}
             </div>
         </div>
-    </div>
-    );
-};
+        {showReportModal && (
+          <div className="report-modal-overlay">
+            <div className="report-modal-content">
+              <div className='report-form'>
+                <h2>Report Post</h2>
+                <textarea
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  placeholder="Enter reason for reporting..."
+                  />
+                  <div className="report-actions">
+                    <button className='submit-report' onClick={handleReportSubmit}>Submit</button>
+                    <button className='cancel' onClick={() => setShowReportModal(false)}>Cancel</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+        );
+    };
 
 export default PostCard;
