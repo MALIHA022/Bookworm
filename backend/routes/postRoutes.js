@@ -66,38 +66,6 @@ router.get('/user/:userId', authenticate, async (req, res) => {
 });
 
 
-// // like a post
-// router.post('/:id/like', async (req, res) => {
-//   const userId = req.body.userId; // Get userId from body or token
-
-//   try {
-//     const post = await Post.findById(req.params.id);
-//     if (!post) return res.status(404).json({ error: 'Post not found' });
-
-//     // Toggle like
-//     if (post.likes.includes(userId)) {
-//       post.likes = post.likes.filter(id => id !== userId);
-//     } else {
-//       post.likes.push(userId);
-//     }
-
-//     const updatedPost = await post.save();
-//     res.json(updatedPost);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Failed to like post' });
-//   }
-// });
-
-// //fetch liked posts
-// router.get('/likes/:userId', async (req, res) => {
-//   try {
-//     const posts = await Post.find({ likes: req.params.userId });
-//     res.json(posts);
-//   } catch (err) {
-//     res.status(500).json({ error: 'Failed to fetch liked posts' });
-//   }
-// });
-
 // Get all wishlisted posts
 router.get('/wishlist', authenticate, async (req, res) => {
   try {
