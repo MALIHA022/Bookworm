@@ -8,6 +8,7 @@ const PostSchema = new mongoose.Schema({
   content: String,                              // review text or description
   description: String,                          // donate/sell description
   price: Number,                                // only for 'sell'
+  likes: Number,
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, { timestamps: true });
 

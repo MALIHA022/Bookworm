@@ -5,9 +5,9 @@ import { NavLink } from 'react-router-dom';
 
 const SidebarAdmin = () => {
   const links = [
-    { to: '/dashboard', icon: 'Home', label: 'Home' },
-    { to: '/allusers', icon: 'Users', label: 'Users' },
-    { to: '/allposts', icon: 'Posts', label: 'Posts' },
+    { to: '/dashboard/admin', icon: 'Home', label: 'Home' },
+    { to: '/users/admin', icon: 'Users', label: 'Users' },
+    { to: '/posts/admin', icon: 'Posts', label: 'Posts' },
   ];
 
   return (

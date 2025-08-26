@@ -21,7 +21,7 @@
 }
 
 .sidebar-icon.active {
-  background-color: 		#c9b2a3;
+  background-color:	#c9b2a3;
   border-radius: 50%;
   padding: 4px;
 }
@@ -30,7 +30,7 @@
 .sidebar-admin {
   width: 60px;
   height: 100vh;
-  background-color: 	#e4d9d1;
+  background-color: #e4d9d1;
   border-right: 1px solid #ddd;
   display: flex;
   flex-direction: column;
@@ -52,7 +52,7 @@
 }
 
 .admin-icon.active {
-  background-color: 		#c9b2a3;
+  background-color: #c9b2a3;
   border-radius: 30%;
   padding: 4px;
 }
