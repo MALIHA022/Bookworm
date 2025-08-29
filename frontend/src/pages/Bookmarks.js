@@ -12,19 +12,44 @@ const Bookmarks = () => {
 
   useEffect(() => {
     const fetchBookmarkedPosts = async () => {
-      const savedBookmarks = JSON.parse(localStorage.getItem('bookmarkedPosts')) || [];
-      if (savedBookmarks.length > 0) {
-        try {
-          const response = await axios.get('http://localhost:5000/api/posts');
-          const posts = response.data.filter(post => savedBookmarks.includes(post._id));
-          setBookmarkedPosts(posts);  // Set bookmarked posts in state
-        } catch (error) {
-          console.error('Error fetching posts:', error);
-        }
+      try {
+        const token = localStorage.getItem('token');
+        const { data } = await axios.get('http://localhost:5000/api/posts/bookmarks', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setBookmarkedPosts(data.posts || []);
+      } catch (error) {
+        console.error('Error fetching bookmarked posts:', error);
       }
     };
 
     fetchBookmarkedPosts();
+  }, []);
+
+  useEffect(() => {
+    const onBookmarkChanged = (e) => {
+      const { postId, bookmarked } = e.detail || {};
+      if (bookmarked) {
+        // If a post was bookmarked elsewhere, refetch to include it
+        (async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const { data } = await axios.get('http://localhost:5000/api/posts/bookmarks', {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setBookmarkedPosts(data.posts || []);
+          } catch (err) {
+            console.error('Error refreshing bookmarks:', err);
+          }
+        })();
+      } else {
+        // If a post was unbookmarked elsewhere, remove it from the current list
+        setBookmarkedPosts(prev => prev.filter(p => p._id !== postId));
+      }
+    };
+
+    window.addEventListener('bookmark-changed', onBookmarkChanged);
+    return () => window.removeEventListener('bookmark-changed', onBookmarkChanged);
   }, []);
 
   return (

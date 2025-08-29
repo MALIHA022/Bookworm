@@ -1,11 +1,15 @@
 // components/PostCard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './postcards.css';
 import './modal.css';
+import { AuthContext } from '../context/AuthContext';
 
 const PostCard = ({ post }) => {
+  const authCtx = useContext(AuthContext) || {};
+  const user = authCtx.user || null;
+  const currentUserId = (user && (user.userId || user.userID)) || localStorage.getItem('userID');
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
   const [bookmarked, setBookmarked] = useState(false);
@@ -17,9 +21,14 @@ const PostCard = ({ post }) => {
 
   
   useEffect(() => {
-    const savedBookmarks = JSON.parse(localStorage.getItem('bookmarkedPosts')) || [];
-    setBookmarked(savedBookmarks.includes(post._id));  // Check if bookmarked
-  }, [post._id]);
+    if (!currentUserId) {
+      setBookmarked(false);
+      return;
+    }
+    const key = `bookmarkedPosts:${currentUserId}`;
+    const savedBookmarks = JSON.parse(localStorage.getItem(key)) || [];
+    setBookmarked(savedBookmarks.includes(post._id));
+  }, [post._id, currentUserId]);
 
   // Handle like
   const handleLike = () => {
@@ -27,18 +36,33 @@ const PostCard = ({ post }) => {
     setLikeCount(liked ? likeCount - 1 : likeCount + 1); // Update like count
   };
 
-  // Handle bookmark
-  const handleBookmark = () => {
-    const savedBookmarks = JSON.parse(localStorage.getItem('bookmarkedPosts')) || [];
-    if (!bookmarked) {
-      savedBookmarks.push(post._id);  // Add post to bookmarked list
-      setBookmarked(true);
-    } else {
-      const index = savedBookmarks.indexOf(post._id);
-      savedBookmarks.splice(index, 1);  // Remove post from bookmarked list
-      setBookmarked(false);
+  // Handle bookmark via backend
+  const handleBookmark = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const { data } = await axios.post(
+        `http://localhost:5000/api/posts/${post._id}/bookmark`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setBookmarked(!!data.bookmarked);
+
+      // Keep localStorage in sync for quick UX across pages
+      const key = currentUserId ? `bookmarkedPosts:${currentUserId}` : 'bookmarkedPosts';
+      const saved = JSON.parse(localStorage.getItem(key)) || [];
+      const idx = saved.indexOf(post._id);
+      if (data.bookmarked && idx === -1) saved.push(post._id);
+      if (!data.bookmarked && idx !== -1) saved.splice(idx, 1);
+      localStorage.setItem(key, JSON.stringify(saved));
+
+      // Notify other parts of the app (e.g., Bookmarks page) about the change
+      window.dispatchEvent(new CustomEvent('bookmark-changed', {
+        detail: { postId: post._id, bookmarked: !!data.bookmarked }
+      }));
+    } catch (e) {
+      console.error('Failed to toggle bookmark', e);
+      alert('Failed to toggle bookmark');
     }
-    localStorage.setItem('bookmarkedPosts', JSON.stringify(savedBookmarks)); // Save to localStorage
   };
 
   // Handle wishlisted

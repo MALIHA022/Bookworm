@@ -1,5 +1,6 @@
 const express = require('express');
 const Post = require('../models/Post'); 
+const User = require('../models/User');
 const Report = require('../models/Reports');
 const authenticate = require('../middleware/authenticate');  
 const router = express.Router();
@@ -78,12 +79,42 @@ router.get('/wishlist', authenticate, async (req, res) => {
 });
 
 
-// Get all bookmarked posts
+// Toggle bookmark for a post for the authenticated user
+router.post('/:id/bookmark', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const postId = req.params.id;
+    const existingIndex = user.bookmarks.findIndex(p => p.toString() === postId);
+
+    if (existingIndex === -1) {
+      user.bookmarks.push(postId);
+      await user.save();
+      return res.json({ message: 'Bookmarked', bookmarked: true });
+    } else {
+      user.bookmarks.splice(existingIndex, 1);
+      await user.save();
+      return res.json({ message: 'Removed bookmark', bookmarked: false });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating bookmark.' });
+  }
+});
+
+// Get all bookmarked posts for the authenticated user
 router.get('/bookmarks', authenticate, async (req, res) => {
   try {
-    const posts = await Post.find({ bookmarked: true }).populate('user', 'firstName lastName');
-    res.json(posts);
+    const user = await User.findById(req.user.id)
+      .populate({
+        path: 'bookmarks',
+        populate: { path: 'user', select: 'firstName lastName' },
+      });
+    const posts = user?.bookmarks || [];
+    res.json({ posts });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Error fetching bookmarked posts.' });
   }
 });
