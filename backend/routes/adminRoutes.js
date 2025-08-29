@@ -35,7 +35,74 @@ router.get('/metrics', authenticate, requireAdmin, async (req, res) => {
   res.json({ totalPosts, totalUsers, totalReports, pendingReports });
 });
 
-// NEW: list reports (optional ?status=pending|resolved)
+// Chart data for analytics
+router.get('/chart-data', authenticate, requireAdmin, async (req, res) => {
+  try {
+    // Get data for the last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Generate date labels for the last 30 days
+    const dateLabels = [];
+    const dateData = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      dateLabels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      dateData.push(date);
+    }
+
+    // Get posts data
+    const postsData = await Promise.all(
+      dateData.map(async (date) => {
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);
+        
+        return await Post.countDocuments({
+          createdAt: { $gte: startOfDay, $lte: endOfDay }
+        });
+      })
+    );
+
+    // Get reports data
+    let reportsData = new Array(30).fill(0);
+    if (Report) {
+      reportsData = await Promise.all(
+        dateData.map(async (date) => {
+          const startOfDay = new Date(date);
+          startOfDay.setHours(0, 0, 0, 0);
+          const endOfDay = new Date(date);
+          endOfDay.setHours(23, 59, 59, 999);
+          
+          return await Report.countDocuments({
+            createdAt: { $gte: startOfDay, $lte: endOfDay }
+          });
+        })
+      );
+    }
+
+    // Get users data
+    const usersData = await Promise.all(
+      dateData.map(async (date) => {
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);
+        
+        return await User.countDocuments({
+          createdAt: { $gte: startOfDay, $lte: endOfDay }
+        });
+      })
+    );
+  } catch (err) {
+    console.error('Error fetching chart data:', err);
+    res.status(500).json({ error: 'Error fetching chart data' });
+  }
+});
+
+//list reports 
 router.get('/reports', authenticate, requireAdmin, async (req, res) => {
   if (!Report) return res.json({ reports: [] }); // no model yet; return empty list
   const { status } = req.query;
@@ -54,7 +121,7 @@ router.get('/reports', authenticate, requireAdmin, async (req, res) => {
   res.json({ reports });
 });
 
-// NEW: update a report (status/feedback)
+// update a report (status/feedback)
 router.patch('/reports/:id', authenticate, requireAdmin, async (req, res) => {
   if (!Report) {
     return res.status(501).json({ error: 'Report model not available' });
