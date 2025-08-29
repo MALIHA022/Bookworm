@@ -35,11 +35,11 @@ router.get('/metrics', authenticate, requireAdmin, async (req, res) => {
   res.json({ totalPosts, totalUsers, totalReports, pendingReports });
 });
 
-// NEW: list reports (optional ?status=pending|actioned|dismissed)
+// NEW: list reports (optional ?status=pending|reviewed|resolved|dismissed)
 router.get('/reports', authenticate, requireAdmin, async (req, res) => {
   if (!Report) return res.json({ reports: [] }); // no model yet; return empty list
   const { status } = req.query;
-  const q = { status: status || 'pending' };
+  const q = status ? { status } : {};
   const reports = await Report.find(q)
     .sort({ createdAt: -1 })
     .populate('post', 'type title bookTitle author user createdAt')
@@ -159,6 +159,11 @@ router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) =>
       await report.save();
 
       res.json({ message: 'Warning sent successfully' });
+    } else if (action === 'dismiss') {
+      report.status = 'dismissed';
+      report.adminAction = 'dismissed';
+      await report.save();
+      res.json({ message: 'Report dismissed' });
     } else {
       return res.status(400).json({ error: 'Invalid action' });
     }
