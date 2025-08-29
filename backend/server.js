@@ -41,7 +41,7 @@ app.use('/api/admin', adminRoutes);
 
 //report route
 const reportRoutes = require('./routes/reportRoutes')
-app.use('api/reports', reportRoutes)
+app.use('/api/reports', reportRoutes)
 
 // Start the server
 const PORT = process.env.PORT || 5000;
