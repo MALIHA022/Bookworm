@@ -7,8 +7,7 @@ import './Admin.css';
 const TABS = [
   { key: 'all', label: 'All' },
   { key: 'pending', label: 'Pending' },
-  { key: 'resolved', label: 'Resolved' },
-  { key: 'dismissed', label: 'Dismissed' }
+  { key: 'resolved', label: 'Resolved' }
 ];
 
 const AdminReports = () => {
@@ -33,7 +32,8 @@ const AdminReports = () => {
         headers: { Authorization: `Bearer ${token}` },
         params
       });
-      const safe = (data.reports || []).filter(r => r.post);
+      // When tab is resolved, API returns both resolved and dismissed
+      const safe = (data.reports || []).filter(r => r.post || r.status !== 'resolved');
       setReports(safe);
     } catch (error) {
       console.error('Error fetching reports:', error);
@@ -178,7 +178,7 @@ const AdminReports = () => {
                   </div>
 
                   <div className="report-actions">
-                    {activeTab === 'pending' && (
+                    {activeTab === 'pending' ? (
                       <>
                         <button 
                           className="remove-btn"
@@ -199,6 +199,8 @@ const AdminReports = () => {
                           Dismiss
                         </button>
                       </>
+                    ) : (
+                      <StatusBadge status={report.status} />
                     )}
                   </div>
                 </div>

@@ -35,12 +35,19 @@ router.get('/metrics', authenticate, requireAdmin, async (req, res) => {
   res.json({ totalPosts, totalUsers, totalReports, pendingReports });
 });
 
-// NEW: list reports (optional ?status=pending|reviewed|resolved|dismissed)
+// NEW: list reports (optional ?status=pending|resolved)
 router.get('/reports', authenticate, requireAdmin, async (req, res) => {
   if (!Report) return res.json({ reports: [] }); // no model yet; return empty list
   const { status } = req.query;
-  const q = status ? { status } : {};
-  const reports = await Report.find(q)
+
+  let query = {};
+  if (status === 'pending') {
+    query = { status: 'pending' };
+  } else if (status === 'resolved') {
+    query = { status: { $in: ['resolved', 'dismissed'] } };
+  } // else: no status filter -> all
+
+  const reports = await Report.find(query)
     .sort({ createdAt: -1 })
     .populate('post', 'type title bookTitle author user createdAt')
     .populate('reportedBy', 'firstName lastName email');
@@ -132,9 +139,11 @@ router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) =>
         } 
       });
 
-      report.status = 'resolved';
-      report.adminAction = 'post_removed';
-      await report.save();
+      // Mark all reports for this post as resolved with action 'post_removed'
+      await Report.updateMany(
+        { post: report.post._id },
+        { $set: { status: 'resolved', adminAction: 'post_removed' } }
+      );
 
       res.json({ message: 'Post removed successfully' });
     } else if (action === 'warn') {
