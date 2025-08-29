@@ -8,13 +8,22 @@ const authenticate = async (req, res, next) => {
   }
 
   try {
-    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Attach the user ID to the request object
-    req.user = decoded;
 
-    next();  // Proceed to the next middleware/route
+    // Support tokens that have either id or userId
+    const userId = decoded.id || decoded.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Invalid token payload' });
+    }
+
+    // Fetch user to attach role and ensure the account exists
+    const user = await User.findById(userId).select('role firstName lastName email');
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    req.user = { id: userId.toString(), role: user.role };
+    next();
   } catch (err) {
     res.status(401).json({ error: 'Invalid or expired token' });
   }
