@@ -103,7 +103,29 @@ router.get('/notifications', authenticate, async (req, res) => {
     
     // Get unread warnings (warnings without 'read' flag)
     const unreadWarnings = user.warnings.filter(warning => !warning.read);
-    res.json({ warnings: unreadWarnings });
+    
+    // Populate sender information for message notifications
+    const populatedWarnings = await Promise.all(
+      unreadWarnings.map(async (warning) => {
+        if (warning.type === 'message' && warning.fromUser) {
+          try {
+            const sender = await User.findById(warning.fromUser).select('firstName lastName email');
+            if (sender) {
+              return {
+                ...warning.toObject(),
+                senderName: `${sender.firstName} ${sender.lastName}`,
+                senderEmail: sender.email
+              };
+            }
+          } catch (err) {
+            console.error('Error populating sender info:', err);
+          }
+        }
+        return warning.toObject();
+      })
+    );
+    
+    res.json({ warnings: populatedWarnings });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching notifications' });
@@ -136,7 +158,7 @@ router.put('/notifications/:warningId/read', authenticate, async (req, res) => {
 // Send a message to a post owner (stores as a notification)
 router.post('/message', authenticate, async (req, res) => {
   try {
-    const { postId, message } = req.body;
+    const { postId, message, isReply, originalMessageId } = req.body;
     if (!postId || !message) {
       return res.status(400).json({ error: 'postId and message are required' });
     }
@@ -147,6 +169,35 @@ router.post('/message', authenticate, async (req, res) => {
     const recipient = await User.findById(post.user);
     if (!recipient) return res.status(404).json({ error: 'Recipient not found' });
 
+    // If this is a reply/conversation continuation, notify the original sender
+    if (isReply && originalMessageId) {
+      // Find the original message in the recipient's warnings
+      const originalMessage = recipient.warnings.id(originalMessageId);
+      if (originalMessage && originalMessage.fromUser) {
+        // Find the original sender and send them a notification about the new message
+        const originalSender = await User.findById(originalMessage.fromUser);
+        if (originalSender) {
+          originalSender.warnings.push({
+            type: 'message',
+            message: message,
+            fromUser: req.user.id,
+            post: post._id,
+            postTitle: post.title || post.bookTitle,
+            postType: post.type,
+            postDescription: post.description || post.content,
+            postAuthor: post.author,
+            postPrice: post.price,
+            at: new Date(),
+            isReply: true,
+            originalMessage: originalMessage.message,
+            conversationId: originalMessageId // Link messages in the same conversation
+          });
+          await originalSender.save();
+        }
+      }
+    }
+
+    // Send notification to the post owner
     recipient.warnings.push({
       type: 'message',
       message,
@@ -154,7 +205,11 @@ router.post('/message', authenticate, async (req, res) => {
       post: post._id,
       postTitle: post.title || post.bookTitle,
       postType: post.type,
-      at: new Date()
+      postDescription: post.description || post.content,
+      postAuthor: post.author,
+      postPrice: post.price,
+      at: new Date(),
+      conversationId: isReply ? originalMessageId : undefined // Link to conversation if it's a reply
     });
 
     await recipient.save();

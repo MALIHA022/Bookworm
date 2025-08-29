@@ -35,7 +35,8 @@ const userSchema = new Schema({
         postAuthor: String,
         postPrice: Number,
         isReply: Boolean,
-        originalMessage: String
+        originalMessage: String,
+        conversationId: { type: mongoose.Schema.Types.ObjectId }
     }],
 });
 

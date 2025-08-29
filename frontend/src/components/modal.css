@@ -185,6 +185,13 @@
   font-size: 12px;
 }
 
+.notification-sender {
+  color: #007bff;
+  font-size: 13px;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
 /* Warning Modal Styling */
 .warning-modal-overlay {
   position: fixed;
@@ -223,6 +230,13 @@
 .warning-date {
   color: #666;
   font-size: 14px;
+}
+
+.warning-sender {
+  color: #007bff;
+  font-size: 14px;
+  margin-bottom: 10px;
+  font-weight: 500;
 }
 
 .warning-message {
@@ -270,8 +284,13 @@
   color: #495057;
 }
 
-/* Reply Section Styling */
-.reply-section {
+/* Message Section Styling */
+.message-section {
+  margin-bottom: 20px;
+}
+
+/* Send Message Section Styling */
+.send-message-section {
   margin-bottom: 20px;
   padding: 15px;
   background-color: #e3f2fd;
@@ -279,10 +298,21 @@
   border-radius: 6px;
 }
 
-.reply-section h4 {
+.send-message-section h4 {
   margin: 0 0 10px 0;
   color: #1976d2;
   font-size: 16px;
+}
+
+.message-sent-success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border: 1px solid #c3e6cb;
+  text-align: center;
 }
 
 .reply-textarea {
@@ -302,7 +332,7 @@
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }
 
-.reply-btn {
+.reply-btn, .send-message-btn {
   background-color: #1976d2;
   color: white;
   border: none;
@@ -313,13 +343,35 @@
   transition: background-color 0.2s;
 }
 
-.reply-btn:hover:not(:disabled) {
+.reply-btn:hover:not(:disabled), .send-message-btn:hover:not(:disabled) {
   background-color: #1565c0;
 }
 
-.reply-btn:disabled {
+.reply-btn:disabled, .send-message-btn:disabled {
   background-color: #bdbdbd;
   cursor: not-allowed;
+}
+
+/* Original Message Section Styling */
+.original-message-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #fff3e0;
+  border: 1px solid #ffcc80;
+  border-radius: 6px;
+}
+
+.original-message-section h4 {
+  margin: 0 0 10px 0;
+  color: #e65100;
+  font-size: 16px;
+}
+
+.original-message {
+  margin: 0;
+  color: #bf360c;
+  line-height: 1.5;
+  font-style: italic;
 }
 
 .warning-actions {

@@ -7,7 +7,6 @@ const Notifications = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [selectedWarning, setSelectedWarning] = useState(null);
-  const [replyMessage, setReplyMessage] = useState('');
 
   useEffect(() => {
     fetchNotifications();
@@ -31,7 +30,6 @@ const Notifications = () => {
     setSelectedWarning(warning);
     setShowWarningModal(true);
     setShowDropdown(false);
-    setReplyMessage('');
   };
 
   const markAsRead = async (warningId) => {
@@ -50,32 +48,11 @@ const Notifications = () => {
     }
   };
 
-  const handleReply = async () => {
-    if (!replyMessage.trim() || !selectedWarning) return;
 
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/users/message', {
-        postId: selectedWarning.post,
-        message: replyMessage,
-        isReply: true,
-        originalMessageId: selectedWarning._id
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      // Mark the original message as read after replying
-      await markAsRead(selectedWarning._id);
-      setReplyMessage('');
-    } catch (error) {
-      console.error('Error sending reply:', error);
-    }
-  };
 
   const closeWarningModal = () => {
     setShowWarningModal(false);
     setSelectedWarning(null);
-    setReplyMessage('');
   };
 
   const getNotificationIcon = (type, isReply) => {
@@ -87,7 +64,7 @@ const Notifications = () => {
 
   const getNotificationTitle = (type, isReply) => {
     if (type === 'message') {
-      return isReply ? 'Reply to Your Message' : 'Message from User';
+      return 'Message from User';
     }
     return 'Admin Warning';
   };
@@ -144,13 +121,18 @@ const Notifications = () => {
                     className="notification-item"
                     onClick={() => handleWarningClick(notification)}
                   >
-                    <div className="notification-icon">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    <div className="notification-content">
-                      <div className="notification-title">
-                        {getNotificationTitle(notification.type)}
-                      </div>
+                                         <div className="notification-icon">
+                       {getNotificationIcon(notification.type, notification.isReply)}
+                     </div>
+                     <div className="notification-content">
+                       <div className="notification-title">
+                         {getNotificationTitle(notification.type)}
+                       </div>
+                       {notification.senderName && (
+                         <div className="notification-sender">
+                           From: {notification.senderName}
+                         </div>
+                       )}
                       <div className="notification-preview">
                         {notification.message.substring(0, 50)}...
                       </div>
@@ -170,10 +152,15 @@ const Notifications = () => {
       {showWarningModal && selectedWarning && (
         <div className="warning-modal-overlay">
           <div className="warning-modal-content">
-            <div className="warning-header">
-              <h3>
-                {getNotificationIcon(selectedWarning.type)} {getNotificationTitle(selectedWarning.type)}
-              </h3>
+                         <div className="warning-header">
+               <h3>
+                 {getNotificationIcon(selectedWarning.type, selectedWarning.isReply)} {getNotificationTitle(selectedWarning.type)}
+               </h3>
+               {selectedWarning.senderName && (
+                 <div className="warning-sender">
+                   From: {selectedWarning.senderName} ({selectedWarning.senderEmail})
+                 </div>
+               )}
               <span className="warning-date">
                 {new Date(selectedWarning.at).toLocaleDateString()}
               </span>
@@ -187,24 +174,11 @@ const Notifications = () => {
               <p>{selectedWarning.message}</p>
             </div>
 
-            {/* Reply Section - Only for user messages */}
-            {selectedWarning.type === 'message' && (
-              <div className="reply-section">
-                <h4>Reply:</h4>
-                <textarea
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  placeholder="Type your reply..."
-                  rows="3"
-                  className="reply-textarea"
-                />
-                <button 
-                  className="reply-btn"
-                  onClick={handleReply}
-                  disabled={!replyMessage.trim()}
-                >
-                  Send Reply
-                </button>
+            {/* Show original message for replies */}
+            {selectedWarning.type === 'message' && selectedWarning.isReply && selectedWarning.originalMessage && (
+              <div className="original-message-section">
+                <h4>Original Message:</h4>
+                <p className="original-message">{selectedWarning.originalMessage}</p>
               </div>
             )}
 

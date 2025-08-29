@@ -154,11 +154,29 @@ router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) =>
       // Add warning to the user who posted the reported content
       const postUser = await User.findById(report.post.user);
       if (postUser) {
-        postUser.warnings.push({
-          message: warningMessage,
-          at: new Date(),
-          adminId: req.user.id
-        });
+        // Get post details for the warning
+        const post = await Post.findById(report.post._id);
+        if (post) {
+          postUser.warnings.push({
+            message: warningMessage,
+            at: new Date(),
+            adminId: req.user.id,
+            type: 'admin_warning',
+            post: post._id,
+            postTitle: post.title || post.bookTitle,
+            postType: post.type,
+            postDescription: post.description || post.content,
+            postAuthor: post.author,
+            postPrice: post.price
+          });
+        } else {
+          postUser.warnings.push({
+            message: warningMessage,
+            at: new Date(),
+            adminId: req.user.id,
+            type: 'admin_warning'
+          });
+        }
         await postUser.save();
       }
 
