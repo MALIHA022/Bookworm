@@ -60,21 +60,9 @@ router.get('/', async (req, res) => {
 router.get('/user/:userId', authenticate, async (req, res) => {
   try {
     const posts = await Post.find({ user: req.params.userId }).populate('user', 'firstName lastName');
-    res.json(posts);  // Return posts for the specified user
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching user posts.' });
-  }
-});
-
-
-// Get all wishlisted posts
-router.get('/wishlist', authenticate, async (req, res) => {
-  try {
-    const posts = await Post.find({ wishlisted: true }).populate('user', 'firstName lastName');
     res.json(posts);  
   } catch (err) {
-    console.error('Error fetching wishlisted posts:', err);
-    res.status(500).json({ error: 'Error fetching wishlisted posts.' });
+    res.status(500).json({ error: 'Error fetching user posts.' });
   }
 });
 
@@ -119,51 +107,61 @@ router.get('/bookmarks', authenticate, async (req, res) => {
   }
 });
 
-// Toggle like for a post for the authenticated user and update like count on Post
-router.post('/:id/like', authenticate, async (req, res) => {
+
+// Toggle wishlist for a post for the authenticated user
+router.post('/:id/wishlist', authenticate, async (req, res) => {
   try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
     const postId = req.params.id;
-    const user = await User.findById(req.user.id).select('likedPosts');
-    if (!user) return res.status(401).json({ error: 'User not found' });
+    const existingIndex = user.wishlist.findIndex(p => p.toString() === postId);
 
-    const post = await Post.findById(postId);
-    if (!post) return res.status(404).json({ error: 'Post not found' });
-
-    if (!Array.isArray(user.likedPosts)) user.likedPosts = [];
-    const idx = user.likedPosts.findIndex(p => p.toString() === postId);
-    let liked;
-    if (idx === -1) {
-      user.likedPosts.push(postId);
-      post.likes = (post.likes || 0) + 1;
-      liked = true;
+    if (existingIndex === -1) {
+      user.wishlist.push(postId);
+      await user.save();
+      return res.json({ message: 'Added to wishlist', wishlisted: true });
     } else {
-      user.likedPosts.splice(idx, 1);
-      post.likes = Math.max((post.likes || 0) - 1, 0);
-      liked = false;
+      user.wishlist.splice(existingIndex, 1);
+      await user.save();
+      return res.json({ message: 'Removed from wishlist', wishlisted: false });
     }
-
-    await Promise.all([user.save(), post.save()]);
-
-    res.json({ liked, likes: post.likes });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error updating like.' });
+    res.status(500).json({ error: 'Error updating wishlist.' });
   }
 });
 
-// Check if a specific post is liked by the authenticated user
-router.get('/:id/liked', authenticate, async (req, res) => {
+// Check if a specific post is wishlisted by the authenticated user
+router.get('/:id/wishlisted', authenticate, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('likedPosts');
-    if (!user) return res.status(401).json({ error: 'User not found' });
+    const user = await User.findById(req.user.id).select('wishlist');
+    if (!user) return res.status(404).json({ error: 'User not found' });
     const postId = req.params.id;
-    const isLiked = user.likedPosts.some(p => p.toString() === postId);
-    res.json({ liked: isLiked });
+    const isWishlisted = user.wishlist.some(p => p.toString() === postId);
+    res.json({ wishlisted: isWishlisted });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error checking like.' });
+    res.status(500).json({ error: 'Error checking wishlist.' });
   }
 });
+
+// Get all wishlisted posts for the authenticated user
+router.get('/wishlist', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id)
+      .populate({
+        path: 'wishlist',
+        populate: { path: 'user', select: 'firstName lastName email' },
+      });
+    const posts = user?.wishlist || [];
+    res.json({ posts });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching wishlisted posts.' });
+  }
+});
+
 
 // Edit a post (owner or admin)
 router.put('/:id', authenticate, async (req, res) => {

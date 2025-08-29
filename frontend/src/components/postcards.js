@@ -47,6 +47,23 @@ const PostCard = ({ post }) => {
     initLiked();
   }, [post._id]);
 
+  // Initialize wishlist state from server for this user
+  useEffect(() => {
+    const initWishlist = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const { data } = await axios.get(`http://localhost:5000/api/posts/${post._id}/wishlisted`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setWishlisted(!!data.wishlisted);
+      } catch (e) {
+        console.error('Failed to fetch wishlist state', e);
+      }
+    };
+    initWishlist();
+  }, [post._id]);
+
   // Handle like via backend and sync count
   const handleLike = async () => {
     try {
@@ -97,21 +114,40 @@ const PostCard = ({ post }) => {
     }
   };
 
-  // Handle wishlisted
-  const handleWishlist = () => {
-    const savedWishlists = JSON.parse(localStorage.getItem('wishlistedPosts')) || [];
-    if (!wishlisted) {
-      savedWishlists.push(post._id);  // Add post to wishlisted list
-      setWishlisted(true);
-    } else {
-      const index = savedWishlists.indexOf(post._id);
-      savedWishlists.splice(index, 1);  // Remove post from wishlisted list
-      setWishlisted(false);
+  // Handle wishlist via backend
+  const handleWishlist = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to add posts to wishlist');
+        return;
+      }
+      const { data } = await axios.post(
+        `http://localhost:5000/api/posts/${post._id}/wishlist`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setWishlisted(!!data.wishlisted);
+
+      const key = currentUserId ? `wishlistedPosts:${currentUserId}` : 'wishlistedPosts';
+      const saved = JSON.parse(localStorage.getItem(key)) || [];
+      const idx = saved.indexOf(post._id);
+      
+      if (data.wishlisted && idx === -1) saved.push(post._id);
+      if (!data.wishlisted && idx !== -1) saved.splice(idx, 1);
+      
+      localStorage.setItem(key, JSON.stringify(saved));
+
+      window.dispatchEvent(new CustomEvent('wishlist-changed', {
+        detail: { postId: post._id, wishlisted: !!data.wishlisted }
+      }));
+    } catch (e) {
+      console.error('Failed to toggle wishlist', e);
+      alert('Failed to toggle wishlist');
     }
-    localStorage.setItem('wishlistedPosts', JSON.stringify(savedWishlists)); // Save to localStorage
   };
   
-  // Conditional rendering of the wishlist button based on the post type
+  // Conditional rendering of the wishlist button
   const renderWishlistButton = () => {
     if (post.type === 'sell' || post.type === 'donate') {
       return (
@@ -120,7 +156,7 @@ const PostCard = ({ post }) => {
         </button>
       );
     }
-    return null; // Don't render Wishlist for 'review' posts
+    return null;
   };
 
 
