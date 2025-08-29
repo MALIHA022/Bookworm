@@ -8,6 +8,8 @@ import PostDetails from '../components/postdetails';
 
 const AllPosts = () => {
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -19,6 +21,7 @@ const AllPosts = () => {
         const response = await axios.get('http://localhost:5000/api/posts');
         console.log(response.data);
         setPosts(response.data);
+        setFilteredPosts(response.data);
         setLoading(false);  // Set loading to false after fetching
       } catch (err) {
         console.error('Error fetching posts', err);
@@ -29,12 +32,67 @@ const AllPosts = () => {
     fetchPosts();
   }, []);
 
+  // Search functionality
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setFilteredPosts(posts);
+      return;
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    const filtered = posts.filter(post => 
+      (post.title && post.title.toLowerCase().includes(searchTerm)) ||
+      (post.bookTitle && post.bookTitle.toLowerCase().includes(searchTerm)) ||
+      (post.author && post.author.toLowerCase().includes(searchTerm)) ||
+      (post.content && post.content.toLowerCase().includes(searchTerm)) ||
+      (post.description && post.description.toLowerCase().includes(searchTerm)) ||
+      (post.type && post.type.toLowerCase().includes(searchTerm)) ||
+      (post.user?.firstName && post.user.firstName.toLowerCase().includes(searchTerm)) ||
+      (post.user?.lastName && post.user.lastName.toLowerCase().includes(searchTerm))
+    );
+    setFilteredPosts(filtered);
+  };
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, posts]);
+
  return (
    <div>  
       <NavbarAdmin />
       <SidebarAdmin />
       <div className="dashboard-container">
         <h2>All Posts</h2>
+        <div className="search-container">
+          <div className="search-input-wrapper">
+            <input
+              type="text"
+              placeholder="Search by title, author, content, or user..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="search-input"
+            />
+            {searchQuery && (
+              <button
+                className="clear-search-btn"
+                onClick={() => setSearchQuery('')}
+                title="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <div className="search-results-info">
+              Showing {filteredPosts.length} of {posts.length} posts
+            </div>
+          )}
+        </div>
           <div>
               {error && <div className="error-message">{error}</div>}
 
@@ -43,10 +101,14 @@ const AllPosts = () => {
                 <p>Loading posts...</p>
               ) : (
               <div className="dashboard-posts-section">
-                {posts.length === 0 ? (
-                  <p>No posts available.</p> 
+                {filteredPosts.length === 0 ? (
+                  searchQuery ? (
+                    <p>No posts found matching "{searchQuery}".</p>
+                  ) : (
+                    <p>No posts available.</p>
+                  )
                 ) : (
-                  posts.map((post) => (
+                  filteredPosts.map((post) => (
                     <PostDetails key={post._id} post={post} />
                   ))
                 )}

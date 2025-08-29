@@ -12,6 +12,8 @@ const TABS = [
 
 const AdminReports = () => {
   const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [warningMessage, setWarningMessage] = useState('');
@@ -35,12 +37,46 @@ const AdminReports = () => {
       // When tab is resolved, API returns both resolved and dismissed
       const safe = (data.reports || []).filter(r => r.post || r.status !== 'resolved');
       setReports(safe);
+      setFilteredReports(safe);
     } catch (error) {
       console.error('Error fetching reports:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  // Search functionality
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setFilteredReports(reports);
+      return;
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    const filtered = reports.filter(report => 
+      (report.reason && report.reason.toLowerCase().includes(searchTerm)) ||
+      (report.reportedBy?.firstName && report.reportedBy.firstName.toLowerCase().includes(searchTerm)) ||
+      (report.reportedBy?.lastName && report.reportedBy.lastName.toLowerCase().includes(searchTerm)) ||
+      (report.post?.title && report.post.title.toLowerCase().includes(searchTerm)) ||
+      (report.post?.bookTitle && report.post.bookTitle.toLowerCase().includes(searchTerm)) ||
+      (report.post?.author && report.post.author.toLowerCase().includes(searchTerm)) ||
+      (report.post?.content && report.post.content.toLowerCase().includes(searchTerm)) ||
+      (report.post?.description && report.post.description.toLowerCase().includes(searchTerm)) ||
+      (report.post?.user?.firstName && report.post.user.firstName.toLowerCase().includes(searchTerm)) ||
+      (report.post?.user?.lastName && report.post.user.lastName.toLowerCase().includes(searchTerm)) ||
+      (report.status && report.status.toLowerCase().includes(searchTerm))
+    );
+    setFilteredReports(filtered);
+  };
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, reports]);
 
   const handleRemovePost = async (reportId) => {
     if (!window.confirm('Are you sure you want to remove this post?')) return;
@@ -138,13 +174,43 @@ const AdminReports = () => {
             ))}
           </div>
 
+          <div className="search-container">
+            <div className="search-input-wrapper">
+              <input
+                type="text"
+                placeholder="Search by reason, user, post content, or status..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+              {searchQuery && (
+                <button
+                  className="clear-search-btn"
+                  onClick={() => setSearchQuery('')}
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            {searchQuery && (
+              <div className="search-results-info">
+                Showing {filteredReports.length} of {reports.length} reports
+              </div>
+            )}
+          </div>
+
           {loading ? (
             <p className="loading">Loading...</p>
-          ) : reports.length === 0 ? (
-            <p className='no-reports'>No reports to show.</p>
+          ) : filteredReports.length === 0 ? (
+            searchQuery ? (
+              <p className='no-reports'>No reports found matching "{searchQuery}".</p>
+            ) : (
+              <p className='no-reports'>No reports to show.</p>
+            )
           ) : (
             <div className="reports-list">
-              {reports.map((report) => (
+              {filteredReports.map((report) => (
                 <div key={report._id} className="report-card">
                   <div className="report-header">
                     <h3>Report #{report._id.slice(-6)}</h3>

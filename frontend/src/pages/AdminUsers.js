@@ -74,14 +74,34 @@ export default function AdminUsers() {
         <div className="container">
           <h2>All Users</h2>
           <div className="main-content">
-            <div className='searchbar'>
-              <form onSubmit={onSearch}>
-                <input className='inputarea'
+            <div className="search-container">
+              <div className="search-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="Search by name or email..."
                   value={q}
-                  onChange={(e)=>setQ(e.target.value)}
-                  placeholder="Search name or email…"/>
-                <button type="submit">Search</button>
-              </form>
+                  onChange={(e) => setQ(e.target.value)}
+                  className="search-input"
+                />
+                {q && (
+                  <button
+                    className="clear-search-btn"
+                    onClick={() => {
+                      setQ('');
+                      load({ q: '', page: 1 });
+                    }}
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              <button 
+                className="search-btn"
+                onClick={() => load({ q, page: 1 })}
+              >
+                🔍 Search
+              </button>
             </div>
 
             {loading && <div>Loading…</div>}
