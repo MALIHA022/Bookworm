@@ -23,7 +23,9 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/posts');
+        const token = localStorage.getItem('token');
+        const url = token ? 'http://localhost:5000/api/posts/feed' : 'http://localhost:5000/api/posts';
+        const response = await axios.get(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
         console.log(response.data);
         setPosts(response.data);
         setLoading(false);  // Set loading to false after fetching
@@ -34,6 +36,15 @@ const Dashboard = () => {
       }
     };
     fetchPosts();
+  }, []);
+
+  useEffect(() => {
+    const onNotInterested = (e) => {
+      const { postId } = e.detail || {};
+      setPosts(prev => prev.filter(p => p._id !== postId));
+    };
+    window.addEventListener('not-interested', onNotInterested);
+    return () => window.removeEventListener('not-interested', onNotInterested);
   }, []);
 
   // Function to handle creating a post

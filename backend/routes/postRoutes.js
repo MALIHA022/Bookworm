@@ -341,4 +341,37 @@ router.post('/:id/report', authenticate, async (req, res) => {
   }
 });
 
+// Mark a post as not interested for the authenticated user
+router.post('/:id/not-interested', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('notInterested');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const postId = req.params.id;
+    const already = user.notInterested?.some(p => p.toString() === postId);
+    if (!already) {
+      user.notInterested.push(postId);
+      await user.save();
+    }
+    return res.json({ message: 'Post marked as not interested', notInterested: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error marking post as not interested.' });
+  }
+});
+
+// Authenticated feed excluding notInterested posts
+router.get('/feed', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('notInterested');
+    const excluded = user?.notInterested || [];
+    const posts = await Post.find({ _id: { $nin: excluded } })
+      .populate('user', 'firstName lastName');
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching feed.' });
+  }
+});
+
 module.exports = router;

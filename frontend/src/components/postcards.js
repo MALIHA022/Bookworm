@@ -180,6 +180,27 @@ const PostCard = ({ post }) => {
     return null;
   };
 
+  const handleNotInterested = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to hide posts');
+        return;
+      }
+      await axios.post(
+        `http://localhost:5000/api/posts/${post._id}/not-interested`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      window.dispatchEvent(new CustomEvent('not-interested', {
+        detail: { postId: post._id }
+      }));
+    } catch (e) {
+      console.error('Failed to mark not interested', e);
+      alert('Failed to mark not interested');
+    }
+  };
 
   // Submit report
   const handleReportSubmit = async () => {
@@ -242,7 +263,7 @@ const PostCard = ({ post }) => {
                   {showDropdown && (
                   <div className="dropdown">
                     <button onClick={() => setShowReportModal(true)}>🚫 Report</button>
-                    <button>🙅 Not Interested</button>
+                    <button onClick={handleNotInterested}>🙅 Not Interested</button>
                   </div>
                   )}
             </div>
