@@ -30,10 +30,42 @@ const PostCard = ({ post }) => {
     setBookmarked(savedBookmarks.includes(post._id));
   }, [post._id, currentUserId]);
 
-  // Handle like
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1); // Update like count
+  // Initialize liked state from server for this user
+  useEffect(() => {
+    const initLiked = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const { data } = await axios.get(`http://localhost:5000/api/posts/${post._id}/liked`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setLiked(!!data.liked);
+      } catch (e) {
+        console.error('Failed to fetch like state', e);
+      }
+    };
+    initLiked();
+  }, [post._id]);
+
+  // Handle like via backend and sync count
+  const handleLike = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to like posts');
+        return;
+      }
+      const { data } = await axios.post(
+        `http://localhost:5000/api/posts/${post._id}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setLiked(!!data.liked);
+      setLikeCount(typeof data.likes === 'number' ? data.likes : (data.liked ? likeCount + 1 : Math.max(likeCount - 1, 0)));
+    } catch (e) {
+      console.error('Failed to toggle like', e);
+      alert('Failed to toggle like');
+    }
   };
 
   // Handle bookmark via backend
@@ -137,7 +169,7 @@ const PostCard = ({ post }) => {
               {bookmarked ? '⭐' : '✰'}
             </button>
             <button onClick={handleLike}>
-              {liked ? '❤️' : '🤍'}
+              {liked ? '❤️' : '🤍'} {likeCount}
             </button>
             <div className="more-menu">
                   <button onClick={() => setShowDropdown(!showDropdown)}>⋮</button>
