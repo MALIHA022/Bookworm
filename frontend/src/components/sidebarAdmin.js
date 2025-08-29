@@ -1,13 +1,14 @@
 // Sidebar.js
 import React from 'react';
 import './sidebar.css';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 const SidebarAdmin = () => {
   const links = [
     { to: '/dashboard/admin', icon: 'Home', label: 'Home' },
     { to: '/users/admin', icon: 'Users', label: 'Users' },
     { to: '/posts/admin', icon: 'Posts', label: 'Posts' },
+    { to: '/reports/admin', icon: 'Reports', label: 'Reports' },
   ];
 
   return (

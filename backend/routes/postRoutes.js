@@ -310,19 +310,35 @@ router.delete('/:id', authenticate, async (req, res) => {
 
 // User reports a post
 router.post('/:id/report', authenticate, async (req, res) => {
-  const { reason } = req.body;
-  if (!reason) return res.status(400).json({ error: 'Reason is required' });
+  try {
+    const { reason } = req.body;
+    if (!reason) return res.status(400).json({ error: 'Reason is required' });
 
-  const post = await Post.findById(req.params.id);
-  if (!post) return res.status(404).json({ error: 'Post not found' });
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
 
-  const report = await Report.create({
-    post: post._id,
-    reportedBy: req.user.id,
-    reason,
-  });
+    // Check if user has already reported this post
+    const existingReport = await Report.findOne({
+      post: post._id,
+      reportedBy: req.user.id
+    });
 
-  res.status(201).json({ message: 'Reported', report });
+    if (existingReport) {
+      return res.status(400).json({ error: 'You have already reported this post' });
+    }
+
+    const report = await Report.create({
+      post: post._id,
+      reportedBy: req.user.id,
+      reason,
+      status: 'pending' // pending, reviewed, resolved
+    });
+
+    res.status(201).json({ message: 'Post reported successfully', report });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error reporting post' });
+  }
 });
 
 module.exports = router;

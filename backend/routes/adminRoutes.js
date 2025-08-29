@@ -9,13 +9,14 @@ router.get('/ping', (req, res) => res.json({ ok: true }));
 
 const Post = require('../models/Post');
 const User = require('../models/User');
+const Report = require('../models/Reports');
 
 // Try to load Report model if it exists
-let Report = null;
+let Reports = null;
 try {
-  Report = require('../models/Reports');
+  Reports = require('../models/Reports');
 } catch (e) {
-  Report = null; 
+  Reports = null; 
 }
 
 // Metrics
@@ -36,14 +37,14 @@ router.get('/metrics', authenticate, requireAdmin, async (req, res) => {
 
 // NEW: list reports (optional ?status=pending|actioned|dismissed)
 router.get('/reports', authenticate, requireAdmin, async (req, res) => {
-  if (!Report) return res.json([]); // no model yet; return empty list
+  if (!Report) return res.json({ reports: [] }); // no model yet; return empty list
   const { status } = req.query;
-  const q = status ? { status } : {};
+  const q = { status: status || 'pending' };
   const reports = await Report.find(q)
     .sort({ createdAt: -1 })
     .populate('post', 'type title bookTitle author user createdAt')
     .populate('reportedBy', 'firstName lastName email');
-  res.json(reports);
+  res.json({ reports });
 });
 
 // NEW: update a report (status/feedback)
@@ -106,5 +107,79 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Admin resolves a report (removes post or sends warning)
+router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { action, warningMessage } = req.body;
+    const report = await Report.findById(req.params.reportId)
+      .populate('post', 'user')
+      .populate('reportedBy', 'firstName lastName');
+
+    if (!report) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    if (action === 'remove') {
+      // Remove the reported post
+      await Post.findByIdAndDelete(report.post._id);
+      
+      // Clean up from all users' arrays
+      await User.updateMany({}, { 
+        $pull: { 
+          bookmarks: report.post._id, 
+          wishlist: report.post._id, 
+          likedPosts: report.post._id 
+        } 
+      });
+
+      report.status = 'resolved';
+      report.adminAction = 'post_removed';
+      await report.save();
+
+      res.json({ message: 'Post removed successfully' });
+    } else if (action === 'warn') {
+      if (!warningMessage) {
+        return res.status(400).json({ error: 'Warning message is required' });
+      }
+
+      // Add warning to the user who posted the reported content
+      const postUser = await User.findById(report.post.user);
+      if (postUser) {
+        postUser.warnings.push({
+          message: warningMessage,
+          at: new Date(),
+          adminId: req.user.id
+        });
+        await postUser.save();
+      }
+
+      report.status = 'resolved';
+      report.adminAction = 'warning_sent';
+      report.warningMessage = warningMessage;
+      await report.save();
+
+      res.json({ message: 'Warning sent successfully' });
+    } else {
+      return res.status(400).json({ error: 'Invalid action' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error processing report' });
+  }
+});
+
+// Get user warnings for admin view
+router.get('/users/:userId/warnings', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select('warnings firstName lastName');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ warnings: user.warnings, user: { firstName: user.firstName, lastName: user.lastName } });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching user warnings' });
+  }
+});
 
 module.exports = router;

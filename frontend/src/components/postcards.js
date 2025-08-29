@@ -185,18 +185,27 @@ const PostCard = ({ post }) => {
   const handleReportSubmit = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/reports", {
-        postId: post._id,
+      if (!token) {
+        alert("Please login to report posts");
+        return;
+      }
+      
+      const { data } = await axios.post(`http://localhost:5000/api/posts/${post._id}/report`, {
         reason: reportReason
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
       alert("Report submitted successfully");
       setShowReportModal(false);
       setReportReason("");
     } catch (err) {
       console.error(err);
-      alert("Failed to submit report");
+      if (err.response?.data?.error) {
+        alert(err.response.data.error);
+      } else {
+        alert("Failed to submit report");
+      }
     }
   };
 

@@ -14,6 +14,7 @@ import AdminRoute from './components/adminRoute'
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUsers from './pages/AdminUsers';
 import AdminPosts from './pages/AdminPosts';
+import AdminReports from './pages/AdminReports';
 
 import './App.css'; 
 
@@ -34,6 +35,7 @@ const App = () => {
         <Route path="/dashboard/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/users/admin" element={<AdminRoute><AdminUsers /></AdminRoute>} />
         <Route path="/posts/admin" element={<AdminRoute><AdminPosts /></AdminRoute>} />
+        <Route path="/reports/admin" element={<AdminRoute><AdminReports /></AdminRoute>} />
       </Routes>
     </Router>
   );
