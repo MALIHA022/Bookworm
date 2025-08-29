@@ -25,7 +25,12 @@ const userSchema = new Schema({
         message: String, 
         at: { type: Date, default: Date.now },
         adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        read: { type: Boolean, default: false }
+        read: { type: Boolean, default: false },
+        type: { type: String, enum: ['admin_warning', 'message'], default: 'admin_warning' },
+        fromUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
+        postTitle: String,
+        postType: String
     }],
 });
 

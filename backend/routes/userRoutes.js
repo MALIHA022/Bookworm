@@ -133,6 +133,39 @@ router.put('/notifications/:warningId/read', authenticate, async (req, res) => {
   }
 });
 
+// Send a message to a post owner (stores as a notification)
+router.post('/message', authenticate, async (req, res) => {
+  try {
+    const { postId, message } = req.body;
+    if (!postId || !message) {
+      return res.status(400).json({ error: 'postId and message are required' });
+    }
+
+    const post = await Post.findById(postId).populate('user', 'firstName lastName');
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    const recipient = await User.findById(post.user);
+    if (!recipient) return res.status(404).json({ error: 'Recipient not found' });
+
+    recipient.warnings.push({
+      type: 'message',
+      message,
+      fromUser: req.user.id,
+      post: post._id,
+      postTitle: post.title || post.bookTitle,
+      postType: post.type,
+      at: new Date()
+    });
+
+    await recipient.save();
+
+    res.json({ message: 'Message sent' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error sending message' });
+  }
+});
+
 router.put('/profile', authenticate, async (req, res) => {
   try {
     const updates = {};

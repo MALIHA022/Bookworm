@@ -11,6 +11,7 @@ const Wishlisted = () => {
   const [wishlistedPosts, setWishlistedPosts] = useState([]);
   const [showContactModal, setShowContactModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [messageText, setMessageText] = useState('');
 
   useEffect(() => {
     const fetchWishlistedPosts = async () => {
@@ -32,7 +33,6 @@ const Wishlisted = () => {
     const onWishlistChanged = (e) => {
       const { postId, wishlisted } = e.detail || {};
       if (wishlisted) {
-        // If a post was wishlisted elsewhere, refetch to include it
         (async () => {
           try {
             const token = localStorage.getItem('token');
@@ -45,7 +45,6 @@ const Wishlisted = () => {
           }
         })();
       } else {
-        // If a post was removed from wishlist elsewhere, remove it from the current list
         setWishlistedPosts(prev => prev.filter(p => p._id !== postId));
       }
     };
@@ -56,12 +55,39 @@ const Wishlisted = () => {
 
   const handleContact = (post) => {
     setSelectedPost(post);
+    setMessageText('');
     setShowContactModal(true);
   };
 
   const closeContactModal = () => {
     setShowContactModal(false);
     setSelectedPost(null);
+    setMessageText('');
+  };
+
+  const sendMessage = async () => {
+    try {
+      if (!messageText.trim()) {
+        alert('Please write a message');
+        return;
+      }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to send messages');
+        return;
+      }
+      await axios.post('http://localhost:5000/api/users/message', {
+        postId: selectedPost._id,
+        message: messageText.trim()
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert('Message sent');
+      closeContactModal();
+    } catch (err) {
+      console.error('Failed to send message', err);
+      alert(err?.response?.data?.error || 'Failed to send message');
+    }
   };
 
   return (
@@ -102,18 +128,25 @@ const Wishlisted = () => {
                   <p><strong>Name:</strong> {selectedPost.user.firstName} {selectedPost.user.lastName}</p>
                   <p><strong>Email:</strong> {selectedPost.user.email}</p>
                   <p><strong>Post Type:</strong> {selectedPost.type}</p>
-                  <p><strong>Message:</strong>
-                  <textarea placeholder="Write your message here..." rows="4"></textarea></p>
                   {selectedPost.type === 'sell' && (
                     <p><strong>Price:</strong> ${selectedPost.price}</p>
                   )}
                 </div>
+                <div className="contact-compose">
+                  <textarea
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Write your message here..."
+                    rows="4"
+                    className="contact-textarea"
+                  />
+                </div>
                 <div className="contact-actions">
                   <button 
                     className="email-btn"
-                    onClick={() => window.open(`mailto:${selectedPost.user.email}?subject=Regarding your ${selectedPost.type} post`, '_blank')}
+                    onClick={sendMessage}
                     >
-                    Send Email
+                    Send Message
                   </button>
                 </div>
               </div>
