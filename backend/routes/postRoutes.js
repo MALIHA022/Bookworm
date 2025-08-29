@@ -91,6 +91,20 @@ router.post('/:id/bookmark', authenticate, async (req, res) => {
   }
 });
 
+// Check if a specific post is bookmarked by the authenticated user
+router.get('/:id/bookmarked', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('bookmarks');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const postId = req.params.id;
+    const isBookmarked = user.bookmarks.some(p => p.toString() === postId);
+    res.json({ bookmarked: isBookmarked });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error checking bookmarks.' });
+  }
+});
+
 // Get all bookmarked posts for the authenticated user
 router.get('/bookmarks', authenticate, async (req, res) => {
   try {
@@ -159,6 +173,52 @@ router.get('/wishlist', authenticate, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error fetching wishlisted posts.' });
+  }
+});
+
+// Toggle like for a post for the authenticated user and update like count on Post
+router.post('/:id/like', authenticate, async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const user = await User.findById(req.user.id).select('likedPosts');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    if (!Array.isArray(user.likedPosts)) user.likedPosts = [];
+    const idx = user.likedPosts.findIndex(p => p.toString() === postId);
+    let liked;
+    if (idx === -1) {
+      user.likedPosts.push(postId);
+      post.likes = (post.likes || 0) + 1;
+      liked = true;
+    } else {
+      user.likedPosts.splice(idx, 1);
+      post.likes = Math.max((post.likes || 0) - 1, 0);
+      liked = false;
+    }
+
+    await Promise.all([user.save(), post.save()]);
+
+    res.json({ liked, likes: post.likes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating like.' });
+  }
+});
+
+// Check if a specific post is liked by the authenticated user
+router.get('/:id/liked', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('likedPosts');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const postId = req.params.id;
+    const isLiked = user.likedPosts.some(p => p.toString() === postId);
+    res.json({ liked: isLiked });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error checking like.' });
   }
 });
 

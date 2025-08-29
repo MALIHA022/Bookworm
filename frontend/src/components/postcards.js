@@ -47,6 +47,23 @@ const PostCard = ({ post }) => {
     initLiked();
   }, [post._id]);
 
+  // Initialize bookmark state from server for this user
+  useEffect(() => {
+    const initBookmark = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const { data } = await axios.get(`http://localhost:5000/api/posts/${post._id}/bookmarked`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setBookmarked(!!data.bookmarked);
+      } catch (e) {
+        console.error('Failed to fetch bookmark state', e);
+      }
+    };
+    initBookmark();
+  }, [post._id]);
+
   // Initialize wishlist state from server for this user
   useEffect(() => {
     const initWishlist = async () => {
@@ -89,6 +106,10 @@ const PostCard = ({ post }) => {
   const handleBookmark = async () => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to bookmark posts');
+        return;
+      }
       const { data } = await axios.post(
         `http://localhost:5000/api/posts/${post._id}/bookmark`,
         {},
