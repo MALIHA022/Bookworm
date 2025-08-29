@@ -30,7 +30,12 @@ const userSchema = new Schema({
         fromUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post' },
         postTitle: String,
-        postType: String
+        postType: String,
+        postDescription: String,
+        postAuthor: String,
+        postPrice: Number,
+        isReply: Boolean,
+        originalMessage: String
     }],
 });
 
