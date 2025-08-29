@@ -29,6 +29,12 @@
   display: flex;
   align-items: center;
 }
+
+.navbar-title a {
+  text-decoration: none;
+  color: #e4d9d1;
+}
+
 .navbar-logo img {
   height: 80px;
 }
@@ -58,7 +64,7 @@
 .navbar-right button {
   background-color:  #ad8c76;
   color: #e4d9d1;
-  font-size: 17px;
+  font-size: 20px;
   border: none;
   padding: 8px 12px;
   border-radius: 6px;

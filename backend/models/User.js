@@ -21,7 +21,12 @@ const userSchema = new Schema({
     }],
     notInterested: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
     status: { type: String, enum: ['active', 'suspended'], default: 'active' },
-    warnings: [{ message: String, at: { type: Date, default: Date.now } }],
+    warnings: [{
+        message: String, 
+        at: { type: Date, default: Date.now },
+        adminId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        read: { type: Boolean, default: false }
+    }],
 });
 
 // Hash password

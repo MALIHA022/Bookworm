@@ -93,6 +93,46 @@ router.get('/posts', authenticate, async (req, res) => {
   }
 });
 
+// Get current user's warnings/notifications
+router.get('/notifications', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('warnings');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Get unread warnings (warnings without 'read' flag)
+    const unreadWarnings = user.warnings.filter(warning => !warning.read);
+    res.json({ warnings: unreadWarnings });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching notifications' });
+  }
+});
+
+// Mark a warning as read
+router.put('/notifications/:warningId/read', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const warning = user.warnings.id(req.params.warningId);
+    if (!warning) {
+      return res.status(404).json({ error: 'Warning not found' });
+    }
+
+    warning.read = true;
+    await user.save();
+
+    res.json({ message: 'Warning marked as read' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating warning' });
+  }
+});
+
 router.put('/profile', authenticate, async (req, res) => {
   try {
     const updates = {};

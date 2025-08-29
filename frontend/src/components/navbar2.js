@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import Notifications from './Notifications';
 import axios from 'axios';
+
 import './navbar.css';
 import CreateReview from './CreateReview'; 
 import CreateDonate from './CreateDonate'; 
@@ -7,12 +11,13 @@ import CreateSell from './CreateSell';
 import './createpost.css'
 
 const Navbar2 = () => {
+  const navigate = useNavigate();
+  // const { user, logout } = useContext(AuthContext);
   const [showPlusDropdown, setShowPlusDropdown] = useState(false);  
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);  
   const [modalOpen, setModalOpen] = useState(false);
   const [postType, setPostType] = useState('');  
   const [posts, setPosts] = useState([]);
-  
 
   let user = null;
   try {
@@ -95,7 +100,9 @@ const Navbar2 = () => {
     <div className="navbar">
       <div className="navbar-logo">
         <img src='/logo.png' alt="BookWorm Logo" />
-        <div className="navbar-title">BookWorm</div>
+        <div className="navbar-title">
+          <Link to="/dashboard">BookWorm</Link>
+        </div>
       </div>
       <div className="navbar-right">
         <input type="text" placeholder="Search books..." className="search-bar" />
@@ -110,8 +117,9 @@ const Navbar2 = () => {
             </div>
           )}
         </div>
-
-        <span className="icon">🔔</span>
+        <div>
+          <Notifications />
+        </div>
 
         {/* Account Dropdown */}
         <div className="account-dropdown">
