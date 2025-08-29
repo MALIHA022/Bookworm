@@ -15,6 +15,9 @@ export default function Explore() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const token = localStorage.getItem('token'); // if your API needs auth
 
@@ -49,6 +52,56 @@ export default function Explore() {
       fetchData();
     }, [tab, token]);
 
+  // Search function
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const res = await axios.get(`${API}/api/posts/search`, {
+        params: { 
+          q: query.trim(),
+          type: tab // Filter by current tab
+        },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      const ALLOWED = ['sell', 'donate'];
+      const onlyAllowed = (res.data || []).filter(p => 
+        ALLOWED.includes(String(p?.type ?? '').trim().toLowerCase())
+      );
+
+      const finalForTab = onlyAllowed.filter(p => 
+        String(p?.type ?? '').trim().toLowerCase() === tab
+      );
+
+      setSearchResults(finalForTab);
+    } catch (e) {
+      console.error('Search error:', e);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery) {
+        handleSearch(searchQuery);
+      } else {
+        setSearchResults([]);
+        setIsSearching(false);
+      }
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, tab]);
+
   return (
     <div className="explore-grid">
       <Navbar2 />
@@ -57,28 +110,62 @@ export default function Explore() {
           <div className='explore-section'>
               <div className="explore-header">
                 <h2>Explore</h2>
-                  <div className="toggle">
-                    <button
-                      className={`toggle-btn ${tab === 'donate' ? 'active' : ''}`}
-                      onClick={() => setTab('donate')}>
-                      Donations
-                    </button>
-                    <button
-                      className={`toggle-btn ${tab === 'sell' ? 'active' : ''}`}
-                      onClick={() => setTab('sell')}>
-                      Sell
-                    </button>
+                <div className="search-container">
+                  <div className="search-input-wrapper">
+                    <input
+                      type="text"
+                      placeholder="Search by book title, post title, or author..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="search-input"
+                    />
+                    {searchQuery && (
+                      <button
+                        className="clear-search-btn"
+                        onClick={() => setSearchQuery('')}
+                        title="Clear search"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
+                  {isSearching && <span className="search-loading">🔍 Searching...</span>}
+                </div>
+                <div className="toggle">
+                  <button
+                    className={`toggle-btn ${tab === 'donate' ? 'active' : ''}`}
+                    onClick={() => setTab('donate')}>
+                    Donations
+                  </button>
+                  <button
+                    className={`toggle-btn ${tab === 'sell' ? 'active' : ''}`}
+                    onClick={() => setTab('sell')}>
+                    Sell
+                  </button>
+                </div>
               </div>
 
               {loading && <p className="muted">Loading…</p>}
               {err && <p className="error">{err}</p>}
-              {!loading && !err && items.length === 0 && (
+              
+              {/* Show search results if available */}
+              {searchQuery && !isSearching && searchResults.length > 0 && (
+                <div className="search-results-header">
+                  <h3>Search Results for "{searchQuery}"</h3>
+                  <p className="search-count">{searchResults.length} result(s) found</p>
+                </div>
+              )}
+              
+              {searchQuery && !isSearching && searchResults.length === 0 && (
+                <p className="muted">No results found for "{searchQuery}"</p>
+              )}
+              
+              {!searchQuery && !loading && !err && items.length === 0 && (
                 <p className="muted">No {tab} posts yet.</p>
               )}
 
               <div className="cards">
-                {items.map(p => (
+                {(searchQuery ? searchResults : items).map(p => (
                   <article key={p._id} className="card">
                     <header className="card-head">
                       <span className={`pill ${p.type}`}>{p.type}</span>

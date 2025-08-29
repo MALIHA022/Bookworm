@@ -105,8 +105,6 @@ const Navbar2 = () => {
         </div>
       </div>
       <div className="navbar-right">
-        <input type="text" placeholder="Search books..." className="search-bar" />
-        
         <div className="plus-icon-dropdown">
           <button className="plus-icon" onClick={togglePlusDropdown}>➕</button>
           {showPlusDropdown && (

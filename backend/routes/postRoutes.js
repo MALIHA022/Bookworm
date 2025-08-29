@@ -56,6 +56,36 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Search posts by book title, post title, or author
+router.get('/search', async (req, res) => {
+  try {
+    const { q, type } = req.query; // q = search query, type = filter by post type
+    
+    let searchQuery = {};
+    
+    // Add type filter if specified
+    if (type && type !== 'all') {
+      searchQuery.type = type;
+    }
+    
+    // Add search query if provided
+    if (q && q.trim()) {
+      const searchRegex = new RegExp(q.trim(), 'i'); // case-insensitive search
+      searchQuery.$or = [
+        { bookTitle: searchRegex },    // Search in book titles
+        { title: searchRegex },        // Search in post titles (for reviews)
+        { author: searchRegex }        // Search in author names
+      ];
+    }
+    
+    const posts = await Post.find(searchQuery).populate('user', 'firstName lastName');
+    res.json(posts);
+  } catch (err) {
+    console.error('Search error:', err);
+    res.status(500).json({ error: 'Error searching posts.' });
+  }
+});
+
 // Get posts by user (for User Dashboard)
 router.get('/user/:userId', authenticate, async (req, res) => {
   try {
