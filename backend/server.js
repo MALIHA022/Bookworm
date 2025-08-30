@@ -3,27 +3,25 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// Initialize environment variables
 dotenv.config();
 
-// Create an Express app
 const app = express();
 
 // Middleware setup
-app.use(express.json());  // For parsing JSON requests
+app.use(express.json());  
 app.use(cors({
-  origin: 'http://localhost:3000',  // Frontend URL
+  origin: 'http://localhost:3000',  
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
-}));  // Enable Cross-Origin Resource Sharing (CORS)
+}));  
 
 // MongoDB Connection
-const mongoURI = process.env.MONGO_URI;  // Access Mongo URI from .env file
+const mongoURI = process.env.MONGO_URI;  
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-// Import and use routes (auth route for login/register)
+// Import login/register routes
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
