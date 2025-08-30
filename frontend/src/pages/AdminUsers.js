@@ -18,9 +18,8 @@ const User = {
 
 export default function AdminUsers() {
   const [rows, setRows] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [q, setQ] = useState('');
-  const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState({ total: 0, pages: 0, limit: 20 });
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
 
@@ -28,24 +27,14 @@ export default function AdminUsers() {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
   }), []);
 
-  const load = async (opts = {}) => {
+  const load = async () => {
     try {
       setLoading(true);
       setErr('');
-      const params = new URLSearchParams({
-        q: opts.q ?? q,
-        page: String(opts.page ?? page),
-        limit: String(meta.limit || 20),
-      });
-      const url = `http://localhost:5000/api/admin/users?${params.toString()}`;
+      const url = 'http://localhost:5000/api/admin/users';
       const res = await axios.get(url, auth);
       setRows(res.data.users || []);
-      setMeta({
-        total: res.data.total,
-        pages: res.data.pages,
-        limit: res.data.limit,
-      });
-      setPage(res.data.page);
+      setFilteredUsers(res.data.users || []); // Initialize filtered users
     } catch (e) {
       setErr(e?.response?.data?.error || 'Failed to fetch users');
     } finally {
@@ -53,15 +42,36 @@ export default function AdminUsers() {
     }
   };
 
-  useEffect(() => { load({ page: 1 }); }, []);
+  useEffect(() => { load(); }, []);
 
-  const onSearch = (e) => {
-    e.preventDefault();
-    load({ q, page: 1 });
+  // Search functionality
+  const handleSearch = (query) => {
+    if (!query.trim()) {
+      setFilteredUsers(rows);
+      return;
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    const filtered = rows.filter(user => 
+      (user.firstName && user.firstName.toLowerCase().includes(searchTerm)) ||
+      (user.lastName && user.lastName.toLowerCase().includes(searchTerm)) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm)) ||
+      (user.gender && user.gender.toLowerCase().includes(searchTerm)) ||
+      (user.role && user.role.toLowerCase().includes(searchTerm)) ||
+      (user.status && user.status.toLowerCase().includes(searchTerm)) ||
+      (user.dob && user.dob.toLowerCase().includes(searchTerm))
+    );
+    setFilteredUsers(filtered);
   };
 
-  const prev = () => page > 1 && load({ page: page - 1 });
-  const next = () => page < meta.pages && load({ page: page + 1 });
+  // Debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch(q);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [q, rows]);
 
   const th = { textAlign:'left', padding:'10px 8px', borderBottom:'1px solid #eee' };
   const td = { padding:'10px 8px', borderBottom:'1px solid #f3f3f3' };
@@ -78,7 +88,7 @@ export default function AdminUsers() {
               <div className="search-input-wrapper">
                 <input
                   type="text"
-                  placeholder="Search by name or email..."
+                  placeholder="Search by name, email, gender, role, status, or date of birth..."
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   className="search-input"
@@ -88,7 +98,7 @@ export default function AdminUsers() {
                     className="clear-search-btn"
                     onClick={() => {
                       setQ('');
-                      load({ q: '', page: 1 });
+                      setFilteredUsers(rows);
                     }}
                     title="Clear search"
                   >
@@ -96,22 +106,23 @@ export default function AdminUsers() {
                   </button>
                 )}
               </div>
-              <button 
-                className="search-btn"
-                onClick={() => load({ q, page: 1 })}
-              >
-                🔍 Search
-              </button>
+              {q && (
+                <div className="search-results-info">
+                  Showing {filteredUsers.length} of {rows.length} users
+                </div>
+              )}
             </div>
 
             {loading && <div>Loading…</div>}
             {err && <div style={{ color:'crimson' }}>{err}</div>}
 
-            {!loading && !rows.length && !err && (
-              <div>No users found.</div>
+            {!loading && !filteredUsers.length && !err && (
+              <div>
+                {q ? `No users found matching "${q}".` : 'No users found.'}
+              </div>
             )}
 
-            {!!rows.length && (
+            {!!filteredUsers.length && (
               <div style={{ overflowX:'auto' }}>
                 <table style={{ width:'100%', borderCollapse:'collapse' }}>
                   <thead>
@@ -125,7 +136,7 @@ export default function AdminUsers() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map(u => (
+                    {filteredUsers.map(u => (
                         <tr key={u._id}>
                         <td style={td}>{u.firstName} {u.lastName}</td>
                         <td style={td}>{u.email}</td>
@@ -140,12 +151,7 @@ export default function AdminUsers() {
               </div>
             )}
 
-            <h4>Total Users: {meta.total} </h4>
-            <div className='page-buttons'>
-              <button onClick={prev} disabled={page<=1}><b>Prev</b></button>
-                Page {page} / {meta.pages || 1}
-              <button onClick={next} disabled={page>=meta.pages}><b>Next</b></button>
-            </div>
+            <h4>Total Users: {rows.length} </h4>
           </div>
         </div>
     </div>
