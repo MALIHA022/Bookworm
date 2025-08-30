@@ -17,7 +17,7 @@ const CreateSell = ({ onPost, onClose }) => {
     }
 
     const post = { bookTitle, author, price, description, type: 'sell' };
-    onPost(post);  // Call the parent function to handle post creation
+    onPost(post); 
     setBookTitle('');
     setAuthor('');
     setPrice('');

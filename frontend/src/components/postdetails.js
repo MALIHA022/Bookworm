@@ -1,13 +1,9 @@
-// components/PostCard.js
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './postdetails.css';
 
 const PostDetails = ({ post }) => {
-//   const [likeCount, setLikeCount] = useState(post.likes || 0);
-
-
   return (
     <div className='post-details'>
       <div className="details">

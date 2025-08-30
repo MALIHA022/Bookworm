@@ -20,7 +20,7 @@ const NavbarAdmin = () => {
     console.error("Error parsing user data:", err);
   }
 
-  // Fetch posts on load
+  // Fetch posts 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -33,7 +33,6 @@ const NavbarAdmin = () => {
     fetchPosts();
   }, []);
 
-  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -46,38 +45,13 @@ const NavbarAdmin = () => {
     setModalOpen(true);  
   };
 
-  // Close the modal
   const closeModal = () => {
     setModalOpen(false);
     setPostType('');
   };
 
-  // Toggle account dropdown
   const toggleAccountDropdown = () => {
     setShowAccountDropdown(!showAccountDropdown);
-  };
-
-  // Handle post creation logic
-  const handlePostCreation = async (postData) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('You must be logged in to create a post.');
-      return;
-    } 
-
-    try {
-      const response = await axios.post(
-        'http://localhost:5000/api/posts/create',
-        postData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      // Update dashboard state
-      setPosts(prev => [response.data, ...prev]);
-      alert('Post created successfully!');
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.error || 'Failed to create post');
-    }
   };
 
   return (

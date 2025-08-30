@@ -15,11 +15,11 @@ const CreateReview = ({ onPost, onClose }) => {
     }
 
     const post = { title, author, content , type: 'review' };
-    onPost(post);  // Call the parent function to handle post creation
+    onPost(post);  
     setTitle('');
     setAuthor('');
     setContent('');
-    onClose();  // Close the modal after posting
+    onClose();
   };
 
   return (

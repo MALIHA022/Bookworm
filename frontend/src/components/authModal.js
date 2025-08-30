@@ -63,7 +63,7 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
       data = res.data;
       console.log("Login/Register response:", data);
     
-      // Store token + user in localStorage
+      // Store token and user in localStorage
       if (data.token) {
         localStorage.setItem("token", data.token);
         if (data.user) {
@@ -75,10 +75,8 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
         console.log("User saved to localStorage:", JSON.parse(localStorage.getItem("user")));
       }
     
-      // Success callback
       onSuccess();
-    
-      // Redirect by role
+  
       const role = data.user?.role || 'user';
       if (role === 'admin') {
         navigate('/dashboard/admin');
@@ -211,7 +209,6 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
     setActivationEmail('');
   };
 
-  // Close modal and reset states
   const handleClose = () => {
     resetFormStates();
     onClose();
@@ -305,7 +302,7 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
                       type="button" 
                       onClick={() => {
                         setShowActivationRequest(true);
-                        setActivationEmail(email); // Pre-fill with current email
+                        setActivationEmail(email); 
                       }}
                       className="activation-request-btn"
                     >

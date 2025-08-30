@@ -12,7 +12,6 @@ import './createpost.css'
 
 const Navbar2 = () => {
   const navigate = useNavigate();
-  // const { user, logout } = useContext(AuthContext);
   const [showPlusDropdown, setShowPlusDropdown] = useState(false);  
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);  
   const [modalOpen, setModalOpen] = useState(false);
@@ -29,7 +28,7 @@ const Navbar2 = () => {
     console.error("Error parsing user data:", err);
   }
 
-  // Fetch posts on load
+  // fetch posts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -42,7 +41,6 @@ const Navbar2 = () => {
     fetchPosts();
   }, []);
 
-  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -55,25 +53,21 @@ const Navbar2 = () => {
     setModalOpen(true);  
   };
 
-  // Close the modal
   const closeModal = () => {
     setModalOpen(false);
     setPostType('');
   };
 
-  // Toggle plus icon dropdown
   const togglePlusDropdown = () => {
     setShowPlusDropdown(!showPlusDropdown);
     setShowAccountDropdown(false);  
   };
 
-  // Toggle account dropdown
   const toggleAccountDropdown = () => {
     setShowAccountDropdown(!showAccountDropdown);
     setShowPlusDropdown(false);
   };
 
-  // Handle post creation logic
   const handlePostCreation = async (postData) => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -87,7 +81,6 @@ const Navbar2 = () => {
         postData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Update dashboard state
       setPosts(prev => [response.data, ...prev]);
       alert('Post created successfully!');
     } catch (err) {

@@ -1,4 +1,3 @@
-// components/PostCard.js
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -30,7 +29,7 @@ const PostCard = ({ post }) => {
     setBookmarked(savedBookmarks.includes(post._id));
   }, [post._id, currentUserId]);
 
-  // Initialize liked state from server for this user
+  //liked posts
   useEffect(() => {
     const initLiked = async () => {
       try {
@@ -47,7 +46,7 @@ const PostCard = ({ post }) => {
     initLiked();
   }, [post._id]);
 
-  // Initialize bookmark state from server for this user
+  // bookmarked posts
   useEffect(() => {
     const initBookmark = async () => {
       try {
@@ -64,7 +63,7 @@ const PostCard = ({ post }) => {
     initBookmark();
   }, [post._id]);
 
-  // Initialize wishlist state from server for this user
+  // wishlisted posts
   useEffect(() => {
     const initWishlist = async () => {
       try {
@@ -81,7 +80,7 @@ const PostCard = ({ post }) => {
     initWishlist();
   }, [post._id]);
 
-  // Handle like via backend and sync count
+  // Handle like count
   const handleLike = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -102,7 +101,7 @@ const PostCard = ({ post }) => {
     }
   };
 
-  // Handle bookmark via backend
+  // Handle bookmark 
   const handleBookmark = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -117,7 +116,6 @@ const PostCard = ({ post }) => {
       );
       setBookmarked(!!data.bookmarked);
 
-      // Keep localStorage in sync for quick UX across pages
       const key = currentUserId ? `bookmarkedPosts:${currentUserId}` : 'bookmarkedPosts';
       const saved = JSON.parse(localStorage.getItem(key)) || [];
       const idx = saved.indexOf(post._id);
@@ -125,7 +123,6 @@ const PostCard = ({ post }) => {
       if (!data.bookmarked && idx !== -1) saved.splice(idx, 1);
       localStorage.setItem(key, JSON.stringify(saved));
 
-      // Notify other parts of the app (e.g., Bookmarks page) about the change
       window.dispatchEvent(new CustomEvent('bookmark-changed', {
         detail: { postId: post._id, bookmarked: !!data.bookmarked }
       }));
@@ -135,7 +132,7 @@ const PostCard = ({ post }) => {
     }
   };
 
-  // Handle wishlist via backend
+  // Handle wishlist 
   const handleWishlist = async () => {
     try {
       const token = localStorage.getItem('token');

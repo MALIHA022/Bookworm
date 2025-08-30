@@ -15,7 +15,7 @@ const CreateDonate = ({ onPost , onClose}) => {
     }
 
     const post = { bookTitle, author, description, type: 'donate' };
-    onPost(post);  // Call the parent function to handle post creation
+    onPost(post); 
     setBookTitle('');
     setAuthor('');
     setDescription('');
