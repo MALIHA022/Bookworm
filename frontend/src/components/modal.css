@@ -40,13 +40,38 @@
   display: flex;
   flex-direction: column;
 }
-.error {
-  color: red;
+
+.default-form p {
+  margin-bottom: 16px;
+  color: #666;
+  text-align: center;
+  font-size: 14px;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
 }
 
 .default-form h2 {
   margin-bottom: 16px;
   color: #333;
+  text-align: center;
 }
 
 .default-form input,
@@ -73,10 +98,53 @@
   padding: 10px;
   border-radius: 6px;
   cursor: pointer;
+  margin-bottom: 12px;
 }
 
 .default-form .submit:hover {
   background-color: #005fa3;
+}
+
+/* Password functionality styling */
+.forgot-password-link,
+.change-password-link {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: #0077cc;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+}
+
+.link-button:hover {
+  color: #005fa3;
+}
+
+.secondary-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.secondary-button:hover {
+  background-color: #5a6268;
+}
+
+/* Error styling for backward compatibility */
+.error {
+  color: red;
 }
 
 /* Notifications Styling */

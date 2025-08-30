@@ -96,6 +96,22 @@ router.get('/chart-data', authenticate, requireAdmin, async (req, res) => {
         });
       })
     );
+
+    // Return the chart data
+    res.json({
+      posts: {
+        labels: dateLabels,
+        data: postsData
+      },
+      reports: {
+        labels: dateLabels,
+        data: reportsData
+      },
+      users: {
+        labels: dateLabels,
+        data: usersData
+      }
+    });
   } catch (err) {
     console.error('Error fetching chart data:', err);
     res.status(500).json({ error: 'Error fetching chart data' });

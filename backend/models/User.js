@@ -38,6 +38,9 @@ const userSchema = new Schema({
         originalMessage: String,
         conversationId: { type: mongoose.Schema.Types.ObjectId }
     }],
+    // Password reset fields
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
 });
 
 // Hash password
