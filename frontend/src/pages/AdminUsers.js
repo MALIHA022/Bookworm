@@ -73,6 +73,46 @@ export default function AdminUsers() {
     return () => clearTimeout(timeoutId);
   }, [q, rows]);
 
+  // Toggle user status
+  const toggleUserStatus = async (userId, currentStatus) => {
+    try {
+      console.log('Attempting to toggle status for user:', userId, 'Current status:', currentStatus);
+      console.log('Auth headers:', auth.headers);
+      
+      const res = await axios.patch(
+        `http://localhost:5000/api/admin/users/${userId}/toggle-status`,
+        {},
+        auth
+      );
+      
+      console.log('Toggle status response:', res.data);
+      
+      // Update local state
+      setRows(prevRows => 
+        prevRows.map(user => 
+          user._id === userId 
+            ? { ...user, status: res.data.status }
+            : user
+        )
+      );
+      
+      // Update filtered users as well
+      setFilteredUsers(prevFiltered => 
+        prevFiltered.map(user => 
+          user._id === userId 
+            ? { ...user, status: res.data.status }
+            : user
+        )
+      );
+      
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      setErr(`Failed to update user status: ${error.response?.data?.error || error.message}`);
+    }
+  };
+
   const th = { textAlign:'left', padding:'10px 8px', borderBottom:'1px solid #eee' };
   const td = { padding:'10px 8px', borderBottom:'1px solid #f3f3f3' };
 
@@ -133,6 +173,7 @@ export default function AdminUsers() {
                       <th style={th}>Date of Birth</th>
                       <th style={th}>Role</th>
                       <th style={th}>Status</th>
+                      <th style={th}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -143,7 +184,20 @@ export default function AdminUsers() {
                         <td style={td}>{u.gender || '-'}</td>
                         <td style={td}>{u.dob}</td>
                         <td style={td}>{u.role}</td>
-                        <td style={td}>{u.status || 'active'}</td>
+                        <td style={td}>
+                          <span className={u.status === 'suspended' ? 'status-suspended' : 'status-active'}>
+                            {u.status || 'active'}
+                          </span>
+                        </td>
+                        <td style={td}>
+                          <button
+                            onClick={() => toggleUserStatus(u._id, u.status)}
+                            className={`status-toggle-btn ${u.status === 'suspended' ? 'activate' : 'suspend'}`}
+                            title={u.status === 'suspended' ? 'Activate User' : 'Suspend User'}
+                          >
+                            {u.status === 'suspended' ? 'Activate' : 'Suspend'}
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

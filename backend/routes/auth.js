@@ -62,6 +62,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
       const user = await User.findOne({ email: emailNorm });
       if (!user) return res.status(400).json({ error: 'User not found' });
 
+      // Check if user is suspended
+      if (user.status === 'suspended') {
+        return res.status(403).json({ 
+          error: 'Account suspended for suspicious activity. Please contact support for assistance.' 
+        });
+      }
+
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
@@ -259,107 +266,6 @@ router.post('/change-password', authenticate, async (req, res) => {
   } catch (err) {
     console.error('Change password error:', err);
     res.status(500).json({ error: 'Server error during password change' });
-  }
-});
-
-// Suspend/Unsuspend User (Admin only)
-router.patch('/users/:userId/status', authenticate, async (req, res) => {
-  try {
-    // Check if the current user is an admin
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    const { userId } = req.params;
-    const { status, reason } = req.body;
-
-    if (!status || !['active', 'suspended'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status. Must be "active" or "suspended"' });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    // Prevent admin from suspending themselves
-    if (user.role === 'admin') {
-      return res.status(400).json({ error: 'Cannot suspend admin users' });
-    }
-
-    const oldStatus = user.status;
-    user.status = status;
-
-    // Add suspension record if suspending
-    if (status === 'suspended' && reason) {
-      if (!user.suspensionHistory) {
-        user.suspensionHistory = [];
-      }
-      user.suspensionHistory.push({
-        reason: reason,
-        suspendedBy: req.user.id,
-        suspendedAt: new Date(),
-        previousStatus: oldStatus
-      });
-    }
-
-    // Add reactivation record if reactivating
-    if (status === 'active' && oldStatus === 'suspended') {
-      if (!user.suspensionHistory) {
-        user.suspensionHistory = [];
-      }
-      user.suspensionHistory.push({
-        reason: 'Account reactivated',
-        reactivatedBy: req.user.id,
-        reactivatedAt: new Date(),
-        previousStatus: oldStatus
-      });
-    }
-
-    await user.save();
-
-    res.json({ 
-      message: `User ${status === 'suspended' ? 'suspended' : 'reactivated'} successfully`,
-      user: {
-        id: user._id,
-        email: user.email,
-        status: user.status
-      }
-    });
-
-  } catch (err) {
-    console.error('User status update error:', err);
-    res.status(500).json({ error: 'Server error during status update' });
-  }
-});
-
-// Get user suspension history (Admin only)
-router.get('/users/:userId/suspension-history', authenticate, async (req, res) => {
-  try {
-    // Check if the current user is an admin
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ error: 'Admin access required' });
-    }
-
-    const { userId } = req.params;
-    const user = await User.findById(userId).select('suspensionHistory firstName lastName email');
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json({ 
-      suspensionHistory: user.suspensionHistory || [],
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email
-      }
-    });
-
-  } catch (err) {
-    console.error('Get suspension history error:', err);
-    res.status(500).json({ error: 'Server error while fetching suspension history' });
   }
 });
 

@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());  // For parsing JSON requests
 app.use(cors({
   origin: 'http://localhost:3000',  // Frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   credentials: true
 }));  // Enable Cross-Origin Resource Sharing (CORS)
 

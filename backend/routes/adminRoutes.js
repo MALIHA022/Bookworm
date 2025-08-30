@@ -297,4 +297,41 @@ router.get('/users/:userId/warnings', authenticate, requireAdmin, async (req, re
   }
 });
 
+// Toggle user status (suspend/unsuspend)
+router.patch('/users/:userId/toggle-status', authenticate, requireAdmin, async (req, res) => {
+  console.log('Toggle status request received:', {
+    userId: req.params.userId,
+    user: req.user,
+    method: req.method,
+    url: req.url
+  });
+  
+  try {
+    const user = await User.findById(req.params.userId);
+    console.log('User found:', user ? 'Yes' : 'No');
+    
+    if (!user) {
+      console.log('User not found with ID:', req.params.userId);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('Current user status:', user.status);
+    
+    // Toggle between active and suspended
+    user.status = user.status === 'active' ? 'suspended' : 'active';
+    console.log('New user status:', user.status);
+    
+    await user.save();
+    console.log('User saved successfully');
+
+    res.json({ 
+      message: `User ${user.status === 'active' ? 'activated' : 'suspended'} successfully`,
+      status: user.status 
+    });
+  } catch (err) {
+    console.error('Toggle user status error:', err);
+    res.status(500).json({ error: 'Server error during status update' });
+  }
+});
+
 module.exports = router;
