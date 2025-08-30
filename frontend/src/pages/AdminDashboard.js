@@ -2,13 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Line, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale,LinearScale,PointElement,LineElement,BarElement,Title,Tooltip,Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale,LinearScale,PointElement,LineElement,Title,Tooltip,Legend } from 'chart.js';
 import NavbarAdmin from '../components/navbarAdmin';
 import SidebarAdmin from '../components/sidebarAdmin';
 import './Dashboard.css';
 
 // Register Chart.js components
-ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, 
+                Title, Tooltip, Legend);
 
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState({});
@@ -92,19 +93,6 @@ export default function AdminDashboard() {
     ]
   };
 
-  const usersChartData = {
-    labels: chartData.users?.labels || [],
-    datasets: [
-      {
-        label: 'New Users Registered',
-        data: chartData.users?.data || [],
-        borderColor: '#4bc0c0ff',
-        backgroundColor: '#4bc0c080',
-        tension: 0.1
-      }
-    ]
-  };
-
   if (loading) {
     return (
       <div className="admin-dashboard-grid">
@@ -173,10 +161,6 @@ export default function AdminDashboard() {
                 <Line data={reportsChartData} options={chartOptions} />
               </div>
               
-              <div className="chart-container">
-                <h4>New Users Registered Over Time</h4>
-                <Line data={usersChartData} options={chartOptions} />
-              </div>
             </div>
           </div>
 

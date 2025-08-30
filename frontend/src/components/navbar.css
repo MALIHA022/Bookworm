@@ -81,19 +81,20 @@
     flex-direction: column;
     top: 40px;
     right: 0;
-    background-color: white;
+    background-color: #fff5f5;
     color: black;
-    padding: 2px;
+    padding: 5px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     flex-wrap: wrap;
     align-content: center;
     justify-content: space-evenly;
     align-items: center;
+    width: max-content;
 }
 
 .dropdown-menu .buttons{
-  background-color: white;
+  background-color: #fff5f5;
   color: #fc6ea5;
   border: none;
   padding: 5px 10px;

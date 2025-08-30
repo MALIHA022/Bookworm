@@ -25,8 +25,8 @@
   border: none;
   cursor: pointer;
   color: #c80000; 
-  top: 60px;
-  right: 0px;
+  top: 70px;
+  right: 10px;
 }
 
 .default-form {
@@ -98,7 +98,6 @@
   padding: 10px;
   border-radius: 6px;
   cursor: pointer;
-  margin-bottom: 12px;
 }
 
 .default-form .submit:hover {
@@ -106,6 +105,14 @@
 }
 
 /* Password functionality styling */
+.switch-auth-type {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    margin-top: 8px;
+    justify-content: space-between;
+    margin: 0px 40px 0px 40px;
+}
 .forgot-password-link,
 .change-password-link {
   text-align: center;
@@ -189,7 +196,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
+  background: #fff5f8;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -254,7 +261,7 @@
 }
 
 .notification-sender {
-  color: #007bff;
+  color: #fc6ea5;
   font-size: 13px;
   margin-bottom: 5px;
   font-weight: 500;
@@ -448,31 +455,19 @@
   justify-content: center;
 }
 
-.mark-read-btn, .close-btn {
+.warning-actions .mark-read-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s;
-}
-
-.mark-read-btn {
-  background-color: #28a745;
+  background-color: #68004b;
   color: white;
 }
 
 .mark-read-btn:hover {
-  background-color: #218838;
-}
-
-.close-btn {
-  background-color: #6c757d;
-  color: white;
-}
-
-.close-btn:hover {
-  background-color: #5a6268;
+  background-color: #440231;
 }
 
 /* Status Display Styling */

@@ -288,17 +288,12 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <div className="forgot-password-link">
-                  <button 
-                    type="button" 
-                    onClick={() => setShowForgotPassword(true)}
-                    className="link-button"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
               </>
             )}
+
+            <button className="submit" type="submit">
+              {type === 'login' ? 'Login' : 'Register'}
+            </button>
 
             {error && (
               <div className="error-message">
@@ -321,22 +316,31 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
               </div>
             )}
             {successMessage && <div className="success-message">{successMessage}</div>}
-            
-            <button className="submit" type="submit">
-              {type === 'login' ? 'Login' : 'Register'}
-            </button>
+            <div className="switch-auth-type">
+              {type === 'login' && (
+                  <div className="forgot-password-link">
+                    <button 
+                      type="button" 
+                      onClick={() => setShowForgotPassword(true)}
+                      className="link-button"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+              )}
 
-            {type === 'login' && (
-              <div className="change-password-link">
-                <button 
-                  type="button" 
-                  onClick={() => setShowChangePassword(true)}
-                  className="link-button"
-                >
-                  Change Password
-                </button>
-              </div>
-            )}
+              {type === 'login' && (
+                <div className="change-password-link">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowChangePassword(true)}
+                    className="link-button"
+                  >
+                    Change Password
+                  </button>
+                </div>
+              )}
+            </div>
           </form>
         )}
 

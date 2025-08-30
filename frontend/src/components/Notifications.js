@@ -152,7 +152,13 @@ const Notifications = () => {
       {showWarningModal && selectedWarning && (
         <div className="warning-modal-overlay">
           <div className="warning-modal-content">
-                         <div className="warning-header">
+            <span 
+                className="close-modal"
+                onClick={closeWarningModal}
+              >
+                ❌
+              </span>
+              <div className="warning-header">
                <h3>
                  {getNotificationIcon(selectedWarning.type, selectedWarning.isReply)} {getNotificationTitle(selectedWarning.type)}
                </h3>
@@ -188,12 +194,6 @@ const Notifications = () => {
                 onClick={() => markAsRead(selectedWarning._id)}
               >
                 Mark as Read
-              </button>
-              <button 
-                className="close-btn"
-                onClick={closeWarningModal}
-              >
-                Close
               </button>
             </div>
           </div>

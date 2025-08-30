@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NavbarAdmin from '../components/navbarAdmin';
 import SidebarAdmin from '../components/sidebarAdmin';
-import './Admin.css';
+import './Dashboard.css';
 
 const TABS = [
   { key: 'all', label: 'All' },
@@ -19,6 +19,7 @@ const AdminReports = () => {
   const [warningMessage, setWarningMessage] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchReports(activeTab);
@@ -155,25 +156,11 @@ const AdminReports = () => {
   );
 
   return (
-    <div className="admin-reports-page">
+    <div>
       <NavbarAdmin />
       <SidebarAdmin />
-      <div className="page-container">
-        <div className="reports-section">
+      <div className="dashboard-container">
           <h2>Reports</h2>
-
-          <div className="tabs">
-            {TABS.map(t => (
-              <button
-                key={t.key}
-                className={`tab-btn ${activeTab === t.key ? 'active' : ''}`}
-                onClick={() => setActiveTab(t.key)}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
           <div className="search-container">
             <div className="search-input-wrapper">
               <input
@@ -200,22 +187,34 @@ const AdminReports = () => {
             )}
           </div>
 
-          {loading ? (
-            <p className="loading">Loading...</p>
-          ) : filteredReports.length === 0 ? (
-            searchQuery ? (
-              <p className='no-reports'>No reports found matching "{searchQuery}".</p>
-            ) : (
-              <p className='no-reports'>No reports to show.</p>
-            )
+        <div className="reports-section">
+        <div className='toggle-tabs'>
+          <div className="tabs">
+            {TABS.map(t => (
+              <button
+                key={t.key}
+                className={`tab-btn ${activeTab === t.key ? 'active' : ''}`}
+                onClick={() => setActiveTab(t.key)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+              {error && <div className="error-message">{error}</div>}
+          
+              {loading ? (
+                  <p className="loading">Loading...</p>
+          ) : reports.length === 0 ? (
+            <p className='no-reports'>No reports to show.</p>
           ) : (
             <div className="reports-list">
-              {filteredReports.map((report) => (
+              {reports.map((report) => (
                 <div key={report._id} className="report-card">
                   <div className="report-header">
                     <h3>Report #{report._id.slice(-6)}</h3>
                     <div className="report-meta">
-                      <StatusBadge status={report.status || 'pending'} />
                       <span className="report-date">
                         {new Date(report.createdAt).toLocaleDateString()}
                       </span>
@@ -232,8 +231,8 @@ const AdminReports = () => {
                   </div>
 
                   <div className="reported-post">
-                    <h4>Reported Post</h4>
-                    <div className="post-info">
+                    <h4>Reported Post Details</h4>
+                    <div className="report-post-info">
                       <p><strong>Type:</strong> {report.post?.type}</p>
                       <p><strong>Title:</strong> {report.post?.title || report.post?.bookTitle}</p>
                       <p><strong>Author:</strong> {report.post?.author}</p>
@@ -259,10 +258,10 @@ const AdminReports = () => {
                           ⚠️ Send Warning
                         </button>
                         <button 
-                          className="close-btn"
+                          className="dismiss-btn"
                           onClick={() => handleDismiss(report._id)}
                         >
-                          Dismiss
+                          🚫 Dismiss
                         </button>
                       </>
                     ) : (

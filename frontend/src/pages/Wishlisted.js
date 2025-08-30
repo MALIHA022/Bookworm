@@ -5,7 +5,7 @@ import Navbar2 from '../components/navbar2';
 import Sidebar from '../components/sidebar';
 import PostCard from '../components/postcards';
 
-import './Wishlisted.css';
+import './Dashboard.css';
 
 const Wishlisted = () => {
   const [wishlistedPosts, setWishlistedPosts] = useState([]);
@@ -172,20 +172,19 @@ const Wishlisted = () => {
   };
 
   return (
-    <div className='wishlist-grid'>
-        {/* <Navbar2 /> */}
-        {/* <Sidebar /> */}
-      <div className="page-container">
-        {/* Toggle Tabs */}
-        <div className="toggle-tabs">
+    <div>
+        <Navbar2 />
+        <Sidebar />
+      <div className="dashboard-container">
+        <div className="toggle">
           <button 
-            className={`tab-btn ${activeTab === 'wishlisted' ? 'active' : ''}`}
+            className={`toggle-btn ${activeTab === 'wishlisted' ? 'active' : ''}`}
             onClick={() => handleTabChange('wishlisted')}
           >
-            📚 Wishlisted Posts
+            Wishlisted Posts
           </button>
           <button 
-            className={`tab-btn ${activeTab === 'messages' ? 'active' : ''}`}
+            className={`toggle-btn ${activeTab === 'messages' ? 'active' : ''}`}
             onClick={() => handleTabChange('messages')}
           >
             💬 Messages
@@ -194,27 +193,46 @@ const Wishlisted = () => {
 
         {/* Wishlisted Posts Tab */}
         {activeTab === 'wishlisted' && (
-          <div className="posts-section">
-            <h2>Wishlisted Posts</h2>
+          <div className='wishlist'>
+          <div className="explore-section">
+          <h2>Wishlisted Posts</h2>
             <div className='posts-list'>
               {wishlistedPosts.length === 0 ? (
                 <p className='no-posts'>No wishlisted posts yet.</p>
               ) : (
                 wishlistedPosts.map(post => (
                   <div key={post._id}>
-                    <PostCard post={post} />
-                    <div className="contact-section">
-                      <button 
-                      className="contact-btn"
-                      onClick={() => handleContact(post)}
-                      >
-                      📧 Contact {post.user.firstName} {post.user.lastName}
-                      </button>
-                      </div>
+                    <div className='wishlist-card'>
+                        <div className='wishlist-card-header'>
+                            <span className={`pill pill-${post.type}`}>{post.type}</span>
+                            <h4> {post.user.firstName} {post.user.lastName}</h4>
+                          </div>
+
+                        <div className='wishlist-card-body'>
+                          <div className='card-title'>
+                            <h3>Book Title: {post.title || post.bookTitle}</h3>
+                          </div>
+                          <div className='card-author'>
+                              <p><strong>Author:</strong> {post.author}</p>
+                          </div>
+
+                          <div className='card-content'>
+                              <p>"{post.content || post.description}"</p>
+                          </div>
+                        </div>  
+                        <div className="contact-section">
+                          <button 
+                          className="contact-btn"
+                          onClick={() => handleContact(post)}
+                          >📧 Message {post.user.firstName} {post.user.lastName}
+                          </button>
+                        </div>
+                    </div>
                   </div>
                 ))
               )}
             </div>
+          </div>
           </div>
         )}
 
@@ -233,7 +251,7 @@ const Wishlisted = () => {
                     onClick={() => handleConversationClick(conversation)}
                   >
                     <div className="conversation-icon">💬</div>
-                                         <div className="conversation-content">
+                      <div className="conversation-content">
                        <div className="conversation-title">
                          {conversation.isReply ? 'Reply to Your Message' : 'Message from User'}
                        </div>
@@ -260,7 +278,7 @@ const Wishlisted = () => {
           {showContactModal && selectedPost && (
             <div className="contact-modal-overlay">
               <div className="contact-modal-content">
-                <button className="close-btn" onClick={closeContactModal}>❌</button>
+                  <button className="close-modal" onClick={closeContactModal}>❌</button>
                 <h3>Contact Information</h3>
                 <div className="contact-details">
                   <p><strong>Name:</strong> {selectedPost.user.firstName} {selectedPost.user.lastName}</p>
@@ -271,6 +289,7 @@ const Wishlisted = () => {
                   )}
                 </div>
                 <div className="contact-compose">
+                  <p><strong>Message:</strong></p>
                   <textarea
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
@@ -295,7 +314,12 @@ const Wishlisted = () => {
       {showMessageModal && selectedConversation && (
         <div className="message-modal-overlay">
           <div className="message-modal-content">
-                         <div className="message-header">
+              <span 
+                className="close-modal"
+                onClick={closeMessageModal}
+              >❌
+              </span>
+            <div className="message-header">
                <h3>💬 Message</h3>
                {selectedConversation.senderName && (
                  <div className="message-sender">
@@ -356,15 +380,6 @@ const Wishlisted = () => {
                 disabled={!replyMessage.trim()}
               >
                 Send Message
-              </button>
-            </div>
-
-            <div className="message-actions">
-              <button 
-                className="close-btn"
-                onClick={closeMessageModal}
-              >
-                Close
               </button>
             </div>
           </div>

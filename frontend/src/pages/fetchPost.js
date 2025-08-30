@@ -1,7 +1,7 @@
 // src/pages/UserSettings.js - section 2
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import './UserSettings.css';
+import './Dashboard.css';
 
 const getLocalUser = () => {
   try { return JSON.parse(localStorage.getItem('user') || '{}'); }

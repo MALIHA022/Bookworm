@@ -1,7 +1,7 @@
 // src/pages/UserSettings.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import './UserSettings.css';
+import './Dashboard.css';
 
 import Sidebar from '../components/sidebar';
 import Navbar from '../components/navbar2';

@@ -57,13 +57,3 @@
   width: 400px;
  
 }
-.close-btn {
-  position: absolute;
-  font-size: 13px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #c80000; 
-  top: 75px;
-  right: 15px;
-}
