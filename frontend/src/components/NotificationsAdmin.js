@@ -173,13 +173,21 @@ const NotificationsAdmin = () => {
   const fetchNotifications = useCallback(async () => {
     try {
       if (!token) return;
-      // 🔁 unread activation requests for admin navbar
       const { data } = await axios.get(
         'http://localhost:5000/api/admin/notifications?unread=true',
         auth
       );
-      // API returns: { notifications: [{ _id, type, title, message, userEmail, userName, at, read }] }
-      setNotifications(data.notifications || []);
+      // Normalize id + safe defaults
+      const list = (data?.notifications || []).map(n => ({
+        ...n,
+        id: n.id || n._id,                                   // <— normalize ID
+        at: n.at || n.createdAt || null,
+        userName: n.userName || '',
+        userEmail: n.userEmail || '',
+        message: n.message || '',
+        type: n.type || 'notification',
+      }));
+      setNotifications(list);
     } catch (error) {
       console.error('Error fetching admin notifications:', error);
     }
@@ -187,7 +195,6 @@ const NotificationsAdmin = () => {
 
   useEffect(() => {
     fetchNotifications();
-    // small poll to keep bell fresh (optional)
     const id = setInterval(fetchNotifications, 15000);
     return () => clearInterval(id);
   }, [fetchNotifications]);
@@ -200,13 +207,17 @@ const NotificationsAdmin = () => {
 
   const markAsRead = async (id) => {
     try {
+      if (!id) {
+        console.error('markAsRead called without a valid id');
+        return;
+      }
       await axios.patch(
         `http://localhost:5000/api/admin/notifications/${id}/read`,
         {},
         auth
       );
-      // remove from list immediately
-      setNotifications(prev => prev.filter(n => n._id !== id));
+      // Optimistically remove from list
+      setNotifications(prev => prev.filter(n => n.id !== id));
       setShowModal(false);
       setSelected(null);
     } catch (error) {
@@ -255,7 +266,7 @@ const NotificationsAdmin = () => {
               <div className="notifications-list">
                 {notifications.map((n) => (
                   <div
-                    key={n._id}
+                    key={n.id}                                         
                     className="notification-item"
                     onClick={() => onClickNotification(n)}
                   >
@@ -278,7 +289,13 @@ const NotificationsAdmin = () => {
                       )}
 
                       <div className="notification-time">
-                        {new Date(n.at || n.createdAt || Date.now()).toLocaleString()}
+                        {(() => {
+                          try {
+                            return new Date(n.at || Date.now()).toLocaleString();
+                          } catch {
+                            return '';
+                          }
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -303,14 +320,20 @@ const NotificationsAdmin = () => {
                 </div>
               )}
               <span className="warning-date">
-                {new Date(selected.at || selected.createdAt || Date.now()).toLocaleString()}
+                {(() => {
+                  try {
+                    return new Date(selected.at || Date.now()).toLocaleString();
+                  } catch {
+                    return '';
+                  }
+                })()}
               </span>
             </div>
 
             <div className="warning-actions">
               <button
                 className="mark-read-btn"
-                onClick={() => markAsRead(selected._id)}
+                onClick={() => markAsRead(selected.id)}                   
               >
                 Mark as Read
               </button>

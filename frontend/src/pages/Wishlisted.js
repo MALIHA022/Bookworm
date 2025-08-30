@@ -252,9 +252,6 @@ const Wishlisted = () => {
                   >
                     <div className="conversation-icon">💬</div>
                       <div className="conversation-content">
-                       <div className="conversation-title">
-                         {conversation.isReply ? 'Reply to Your Message' : 'Message from User'}
-                       </div>
                        {conversation.senderName && (
                          <div className="conversation-sender">
                            From: {conversation.senderName}
@@ -275,42 +272,43 @@ const Wishlisted = () => {
         )}
       </div>
 
-          {showContactModal && selectedPost && (
-            <div className="contact-modal-overlay">
-              <div className="contact-modal-content">
-                  <button className="close-modal" onClick={closeContactModal}>❌</button>
-                <h3>Contact Information</h3>
-                <div className="contact-details">
-                  <p><strong>Name:</strong> {selectedPost.user.firstName} {selectedPost.user.lastName}</p>
-                  <p><strong>Email:</strong> {selectedPost.user.email}</p>
-                  <p><strong>Post Type:</strong> {selectedPost.type}</p>
-                  {selectedPost.type === 'sell' && (
-                    <p><strong>Price:</strong> ${selectedPost.price}</p>
-                  )}
-                </div>
-                <div className="contact-compose">
-                  <p><strong>Message:</strong></p>
-                  <textarea
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Write your message here..."
-                    rows="4"
-                    className="contact-textarea"
-                  />
-                </div>
-                <div className="contact-actions">
-                  <button 
-                    className="email-btn"
-                    onClick={sendMessage}
-                    >
-                    Send Message
-                  </button>
-                </div>
-              </div>
+      {/* Contact User Modal */}
+      {showContactModal && selectedPost && (
+        <div className="contact-modal-overlay">
+          <div className="contact-modal-content">
+              <button className="close-modal" onClick={closeContactModal}>❌</button>
+            <h3>Contact Information</h3>
+            <div className="contact-details">
+              <p><strong>Name:</strong> {selectedPost.user.firstName} {selectedPost.user.lastName}</p>
+              <p><strong>Email:</strong> {selectedPost.user.email}</p>
+              <p><strong>Post Type:</strong> {selectedPost.type}</p>
+              {selectedPost.type === 'sell' && (
+                <p><strong>Price:</strong> ${selectedPost.price}</p>
+              )}
             </div>
-          )}
+            <div className="contact-compose">
+              <p><strong>Message:</strong></p>
+              <textarea
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                placeholder="Write your message here..."
+                rows="4"
+                className="contact-textarea"
+              />
+            </div>
+            <div className="contact-actions">
+              <button 
+                className="email-btn"
+                onClick={sendMessage}
+                >
+                Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Message Modal for Conversations */}
+      {/* Message Modal To send Messages */}
       {showMessageModal && selectedConversation && (
         <div className="message-modal-overlay">
           <div className="message-modal-content">

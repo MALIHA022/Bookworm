@@ -156,6 +156,71 @@ router.put('/notifications/:warningId/read', authenticate, async (req, res) => {
 });
 
 // Send a message to a post owner (stores as a notification)
+// router.post('/message', authenticate, async (req, res) => {
+//   try {
+//     const { postId, message, isReply, originalMessageId } = req.body;
+//     if (!postId || !message) {
+//       return res.status(400).json({ error: 'postId and message are required' });
+//     }
+
+//     const post = await Post.findById(postId).populate('user', 'firstName lastName');
+//     if (!post) return res.status(404).json({ error: 'Post not found' });
+
+//     const recipient = await User.findById(post.user);
+//     if (!recipient) return res.status(404).json({ error: 'Recipient not found' });
+
+//     // If this is a reply/conversation continuation, notify the original sender
+//     if (isReply && originalMessageId) {
+//       // Find the original message in the recipient's warnings
+//       const originalMessage = recipient.warnings.id(originalMessageId);
+//       if (originalMessage && originalMessage.fromUser) {
+//         // Find the original sender and send them a notification about the new message
+//         const originalSender = await User.findById(originalMessage.fromUser);
+//         if (originalSender) {
+//           originalSender.warnings.push({
+//             type: 'message',
+//             message: message,
+//             fromUser: req.user.id,
+//             post: post._id,
+//             postTitle: post.title || post.bookTitle,
+//             postType: post.type,
+//             postDescription: post.description || post.content,
+//             postAuthor: post.author,
+//             postPrice: post.price,
+//             at: new Date(),
+//             isReply: true,
+//             originalMessage: originalMessage.message,
+//             conversationId: originalMessageId // Link messages in the same conversation
+//           });
+//           await originalSender.save();
+//         }
+//       }
+//     }
+
+//     // Send notification to the post owner
+//     recipient.warnings.push({
+//       type: 'message',
+//       message,
+//       fromUser: req.user.id,
+//       post: post._id,
+//       postTitle: post.title || post.bookTitle,
+//       postType: post.type,
+//       postDescription: post.description || post.content,
+//       postAuthor: post.author,
+//       postPrice: post.price,
+//       at: new Date(),
+//       conversationId: isReply ? originalMessageId : undefined // Link to conversation if it's a reply
+//     });
+
+//     await recipient.save();
+
+//     res.json({ message: 'Message sent' });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: 'Error sending message' });
+//   }
+// });
+// Send a message to a post owner (stores as a notification)
 router.post('/message', authenticate, async (req, res) => {
   try {
     const { postId, message, isReply, originalMessageId } = req.body;
@@ -169,12 +234,10 @@ router.post('/message', authenticate, async (req, res) => {
     const recipient = await User.findById(post.user);
     if (!recipient) return res.status(404).json({ error: 'Recipient not found' });
 
-    // If this is a reply/conversation continuation, notify the original sender
     if (isReply && originalMessageId) {
-      // Find the original message in the recipient's warnings
+      // 🔹 Handle reply: notify only the original sender
       const originalMessage = recipient.warnings.id(originalMessageId);
       if (originalMessage && originalMessage.fromUser) {
-        // Find the original sender and send them a notification about the new message
         const originalSender = await User.findById(originalMessage.fromUser);
         if (originalSender) {
           originalSender.warnings.push({
@@ -195,24 +258,24 @@ router.post('/message', authenticate, async (req, res) => {
           await originalSender.save();
         }
       }
+    } else {
+      // 🔹 New message (not a reply): notify the post owner
+      recipient.warnings.push({
+        type: 'message',
+        message,
+        fromUser: req.user.id,
+        post: post._id,
+        postTitle: post.title || post.bookTitle,
+        postType: post.type,
+        postDescription: post.description || post.content,
+        postAuthor: post.author,
+        postPrice: post.price,
+        at: new Date(),
+        isReply: false
+      });
+
+      await recipient.save();
     }
-
-    // Send notification to the post owner
-    recipient.warnings.push({
-      type: 'message',
-      message,
-      fromUser: req.user.id,
-      post: post._id,
-      postTitle: post.title || post.bookTitle,
-      postType: post.type,
-      postDescription: post.description || post.content,
-      postAuthor: post.author,
-      postPrice: post.price,
-      at: new Date(),
-      conversationId: isReply ? originalMessageId : undefined // Link to conversation if it's a reply
-    });
-
-    await recipient.save();
 
     res.json({ message: 'Message sent' });
   } catch (err) {
@@ -220,6 +283,7 @@ router.post('/message', authenticate, async (req, res) => {
     res.status(500).json({ error: 'Error sending message' });
   }
 });
+
 
 router.put('/profile', authenticate, async (req, res) => {
   try {
