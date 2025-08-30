@@ -365,4 +365,68 @@ router.get('/activation-requests', authenticate, requireAdmin, async (req, res) 
   }
 });
 
+// Get current user's warnings/notifications
+router.get('/notifications', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('activationRequests');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Get unread activation requests (requests without 'read' flag)
+    const unreadRequests = user.activationRequests.filter(request => !request.read);
+
+    // Populate sender information for message notifications
+    const populatedRequests = await Promise.all(
+      unreadRequests.map(async (request) => {
+        if (request.type === 'message' && request.fromUser) {
+          try {
+            const sender = await User.findById(request.fromUser).select('firstName lastName email');
+            if (sender) {
+              return {
+                ...request.toObject(),
+                senderName: `${sender.firstName} ${sender.lastName}`,
+                senderEmail: sender.email
+              };
+            }
+          } catch (err) {
+            console.error('Error populating sender info:', err);
+          }
+        }
+        return warning.toObject();
+      })
+    );
+    
+    res.json({ warnings: populatedWarnings });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching notifications' });
+  }
+});
+
+// Mark a request as read
+router.put('/notifications/:requestId/read', authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const request = user.activationRequests.id(req.params.requestId);
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    request.read = true;
+    await user.save();
+
+    res.json({ message: 'Request marked as read' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error updating request' });
+  }
+});
+
+
+
 module.exports = router;

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './navbar.css';
-
-// import './createpost.css'
+import NotificationsAdmin from './NotificationsAdmin';
 
 const NavbarAdmin = () => {
   const [showAccountDropdown, setShowAccountDropdown] = useState(false);  
@@ -88,19 +87,10 @@ const NavbarAdmin = () => {
         <div className="navbar-title">BookWorm</div>
       </div>
       <div className="navbar-right">
-        
-        <div className="plus-icon-dropdown">
-          {/* <button className="plus-icon" onClick={togglePlusDropdown}>➕</button> */}
-          {/* {showPlusDropdown && (
-            <div className="dropdown-menu-plus">
-              <button onClick={() => openModal('review')}>Review</button>
-              <button onClick={() => openModal('donate')}>Donate</button>
-              <button onClick={() => openModal('sell')}>Sell</button>
-            </div>
-          )} */}
+      
+        <div>
+          <NotificationsAdmin />
         </div>
-
-        <span className="icon">🔔</span>
 
         {/* Account Dropdown */}
         <div className="account-dropdown">
