@@ -35,7 +35,7 @@ const AdminReports = () => {
         headers: { Authorization: `Bearer ${token}` },
         params
       });
-      // When tab is resolved, API returns both resolved and dismissed
+
       const safe = (data.reports || []).filter(r => r.post || r.status !== 'resolved');
       setReports(safe);
       setFilteredReports(safe);
@@ -46,7 +46,7 @@ const AdminReports = () => {
     }
   };
 
-  // Search functionality
+  // Search 
   const handleSearch = (query) => {
     if (!query.trim()) {
       setFilteredReports(reports);
@@ -70,7 +70,6 @@ const AdminReports = () => {
     setFilteredReports(filtered);
   };
 
-  // Debounced search
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(searchQuery);
@@ -79,6 +78,7 @@ const AdminReports = () => {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, reports]);
 
+  //delete post by admin
   const handleRemovePost = async (reportId) => {
     if (!window.confirm('Are you sure you want to remove this post?')) return;
 
@@ -91,7 +91,7 @@ const AdminReports = () => {
       });
 
       alert('Post removed successfully');
-      fetchReports(activeTab); // Refresh the list using current tab
+      fetchReports(activeTab);
     } catch (error) {
       console.error('Error removing post:', error);
       alert('Failed to remove post');
@@ -117,7 +117,7 @@ const AdminReports = () => {
       setShowWarningModal(false);
       setSelectedReport(null);
       setWarningMessage('');
-      fetchReports(activeTab); // Refresh the list using current tab
+      fetchReports(activeTab);
     } catch (error) {
       console.error('Error sending warning:', error);
       alert('Failed to send warning');
@@ -275,7 +275,7 @@ const AdminReports = () => {
         </div>
       </div>
 
-      {/* Warning Modal */}
+      {/* Admin sends warning Modal */}
       {showWarningModal && selectedReport && (
         <div className="warning-modal-overlay">
           <div className="warning-modal-content">

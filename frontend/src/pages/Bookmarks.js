@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import Navbar2 from '../components/navbar2';
 import Sidebar from '../components/sidebar';
-import PostCard from '../components/postcards';  // Reuse the PostCard component
+import PostCard from '../components/postcards';
 
 import './Dashboard.css';
 
@@ -30,7 +30,6 @@ const Bookmarks = () => {
     const onBookmarkChanged = (e) => {
       const { postId, bookmarked } = e.detail || {};
       if (bookmarked) {
-        // If a post was bookmarked elsewhere, refetch to include it
         (async () => {
           try {
             const token = localStorage.getItem('token');
@@ -43,7 +42,6 @@ const Bookmarks = () => {
           }
         })();
       } else {
-        // If a post was unbookmarked elsewhere, remove it from the current list
         setBookmarkedPosts(prev => prev.filter(p => p._id !== postId));
       }
     };

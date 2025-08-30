@@ -190,7 +190,6 @@
   }
 }
 
-/* Status Toggle Button Styling */
 .status-toggle-btn {
   border: none;
   padding: 6px 12px;
@@ -204,7 +203,7 @@
 
 .status-toggle-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px #00000033;
 }
 
 .status-toggle-btn.suspend {
@@ -224,7 +223,6 @@
   box-shadow: none;
 }
 
-/* Status Display Styling */
 .status-active {
   color: #28a745;
   font-weight: bold;

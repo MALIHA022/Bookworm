@@ -10,7 +10,7 @@ import './Dashboard.css';
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 export default function Explore() {
-  const [tab, setTab] = useState('donate'); // 'donate' | 'sell'
+  const [tab, setTab] = useState('donate'); 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -18,7 +18,7 @@ export default function Explore() {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const token = localStorage.getItem('token'); // if your API needs auth
+  const token = localStorage.getItem('token'); 
 
     useEffect(() => {
       const fetchData = async () => {
@@ -26,7 +26,6 @@ export default function Explore() {
         setErr('');
         try {
           const res = await axios.get(`${API}/api/posts`, {
-            // keep the param if your backend supports it; otherwise client-side filter still works
             params: { type: tab }, 
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
@@ -51,7 +50,7 @@ export default function Explore() {
       fetchData();
     }, [tab, token]);
 
-  // Search function
+  // Search 
   const handleSearch = async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -64,7 +63,7 @@ export default function Explore() {
       const res = await axios.get(`${API}/api/posts/search`, {
         params: { 
           q: query.trim(),
-          type: tab // Filter by current tab
+          type: tab 
         },
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
@@ -87,7 +86,6 @@ export default function Explore() {
     }
   };
 
-  // Debounced search
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchQuery) {
@@ -144,7 +142,7 @@ export default function Explore() {
           {loading && <p className="muted">Loading…</p>}
           {err && <p className="error">{err}</p>}
           
-          {/* Show search results if available */}
+          {/* Show search results */}
           {searchQuery && !isSearching && searchResults.length > 0 && (
             <div className="search-results-header">
               <h3>Search Results for "{searchQuery}"</h3>

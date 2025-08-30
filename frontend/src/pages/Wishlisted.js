@@ -12,7 +12,7 @@ const Wishlisted = () => {
   const [showContactModal, setShowContactModal] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [messageText, setMessageText] = useState('');
-  const [activeTab, setActiveTab] = useState('wishlisted'); // 'wishlisted' or 'messages'
+  const [activeTab, setActiveTab] = useState('wishlisted'); 
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [replyMessage, setReplyMessage] = useState('');
@@ -37,7 +37,6 @@ const Wishlisted = () => {
         const { data } = await axios.get('http://localhost:5000/api/users/notifications', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        // Filter only message notifications and group by conversation
         const messageNotifications = data.warnings.filter(n => n.type === 'message');
         setConversations(messageNotifications);
       } catch (error) {
@@ -119,7 +118,6 @@ const Wishlisted = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     if (tab === 'messages') {
-      // Refresh conversations when switching to messages tab
       const fetchConversations = async () => {
         try {
           const token = localStorage.getItem('token');
@@ -159,7 +157,6 @@ const Wishlisted = () => {
       setReplyMessage('');
       alert('Message sent successfully!');
       
-      // Refresh conversations
       const { data } = await axios.get('http://localhost:5000/api/users/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });

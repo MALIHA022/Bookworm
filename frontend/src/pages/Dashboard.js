@@ -19,7 +19,7 @@ const Dashboard = () => {
   const [showSellModal, setShowSellModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
 
-  // Fetch posts when component mounts
+  // Fetch posts 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -28,7 +28,7 @@ const Dashboard = () => {
         const response = await axios.get(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
         console.log(response.data);
         setPosts(response.data);
-        setLoading(false);  // Set loading to false after fetching
+        setLoading(false);  
       } catch (err) {
         console.error('Error fetching posts', err);
         setError('Failed to load posts. Please try again later.');
@@ -47,9 +47,9 @@ const Dashboard = () => {
     return () => window.removeEventListener('not-interested', onNotInterested);
   }, []);
 
-  // Function to handle creating a post
+  // create post
   const handleCreatePost = async (postData) => {
-    const token = localStorage.getItem('token'); // JWT from login
+    const token = localStorage.getItem('token');
     if (!token) {
       alert('You must be logged in to create a post.');
       return;
@@ -61,7 +61,7 @@ const Dashboard = () => {
         postData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setPosts(prev => [response.data, ...prev]); // Add new post to top
+      setPosts(prev => [response.data, ...prev]); 
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.error || 'Failed to create post');
@@ -98,14 +98,14 @@ const Dashboard = () => {
 
           {/* Posts Section */}
           { loading ? (
-            <p>Loading posts...</p>  // Show a loading message while fetching
+            <p>Loading posts...</p>
           ) : (
           <div className="dashboard-posts-section">
             {posts.length === 0 ? (
-              <p>No posts available.</p>  // Display message if there are no posts
+              <p>No posts available.</p>  
             ) : (
               posts.map((post) => (
-                <PostCard key={post._id} post={post} />  // Display each post as a PostCard
+                <PostCard key={post._id} post={post} />
               ))
             )}
           </div>

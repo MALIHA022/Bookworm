@@ -22,7 +22,7 @@ const AllPosts = () => {
         console.log(response.data);
         setPosts(response.data);
         setFilteredPosts(response.data);
-        setLoading(false);  // Set loading to false after fetching
+        setLoading(false); 
       } catch (err) {
         console.error('Error fetching posts', err);
         setError('Failed to load posts. Please try again later.');
@@ -32,7 +32,7 @@ const AllPosts = () => {
     fetchPosts();
   }, []);
 
-  // Search functionality
+  // Search 
   const handleSearch = (query) => {
     if (!query.trim()) {
       setFilteredPosts(posts);
@@ -52,8 +52,7 @@ const AllPosts = () => {
     );
     setFilteredPosts(filtered);
   };
-
-  // Debounced search
+  
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(searchQuery);

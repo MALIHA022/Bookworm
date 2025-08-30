@@ -1,10 +1,7 @@
-// src/pages/UserSettings.js - section 1
+// UserSettings - section 1
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import './Dashboard.css';
-
-import Navbar from '../components/navbar2';
-import Sidebar from '../components/sidebar';
 
 const ageFromDob = (dobStr) => {
   if (!dobStr) return '-';
@@ -66,7 +63,6 @@ export default function FetchUser() {
       const { data } = await axios.put('http://localhost:5000/api/users/profile', draft, auth);
       const updated = data?.user || draft;
       setProfile(updated);
-      // Keep localStorage user in sync if you rely on it elsewhere
       const ls = { ...(JSON.parse(localStorage.getItem('user') || '{}')), ...updated };
       localStorage.setItem('user', JSON.stringify(ls));
       setEditing(false);
@@ -116,7 +112,6 @@ export default function FetchUser() {
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
-                  <option value="Other">Other</option> {/* If you want to allow "Other" */}
                 </select>
               </label>
               <label>Date of Birth

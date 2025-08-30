@@ -1,4 +1,3 @@
-// src/pages/AdminUsers.jsx
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import NavbarAdmin from '../components/navbarAdmin';
@@ -34,7 +33,7 @@ export default function AdminUsers() {
       const url = 'http://localhost:5000/api/admin/users';
       const res = await axios.get(url, auth);
       setRows(res.data.users || []);
-      setFilteredUsers(res.data.users || []); // Initialize filtered users
+      setFilteredUsers(res.data.users || []);
     } catch (e) {
       setErr(e?.response?.data?.error || 'Failed to fetch users');
     } finally {
@@ -44,7 +43,7 @@ export default function AdminUsers() {
 
   useEffect(() => { load(); }, []);
 
-  // Search functionality
+  // Search 
   const handleSearch = (query) => {
     if (!query.trim()) {
       setFilteredUsers(rows);
@@ -64,7 +63,6 @@ export default function AdminUsers() {
     setFilteredUsers(filtered);
   };
 
-  // Debounced search
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleSearch(q);
@@ -87,7 +85,6 @@ export default function AdminUsers() {
       
       console.log('Toggle status response:', res.data);
       
-      // Update local state
       setRows(prevRows => 
         prevRows.map(user => 
           user._id === userId 
@@ -96,7 +93,7 @@ export default function AdminUsers() {
         )
       );
       
-      // Update filtered users as well
+      // Update filtered users
       setFilteredUsers(prevFiltered => 
         prevFiltered.map(user => 
           user._id === userId 

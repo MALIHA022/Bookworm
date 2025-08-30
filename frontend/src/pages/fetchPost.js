@@ -1,4 +1,4 @@
-// src/pages/UserSettings.js - section 2
+// UserSettings- section 2
 import React, { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import './Dashboard.css';
@@ -18,11 +18,11 @@ export default function FetchUser() {
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState('');
   const [editingId, setEditingId] = useState(null);
-  const [draft, setDraft] = useState({}); // current editable fields
+  const [draft, setDraft] = useState({}); 
 
   const auth = {headers: { Authorization: `Bearer ${token}` }};
 
-  // Fetch user's posts
+  // Fetch posts
   useEffect(() => {
     const fetchMyPosts = async () => {
       if (!token) { setError('User not logged in.'); setLoadingPosts(false); return; }
@@ -72,9 +72,7 @@ export default function FetchUser() {
         price: draft.type === 'sell' ? Number(draft.price) : null
       };
 
-      // Send PUT request to update the post
-      const { data: updated } = await axios.put(
-        `http://localhost:5000/api/posts/${id}`,
+      const { data: updated } = await axios.put(`http://localhost:5000/api/posts/${id}`,
         body,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -87,26 +85,20 @@ export default function FetchUser() {
     }
   };
 
-
-
-
+  // delete post
   const removePost = async (id) => {
     if (!window.confirm('Delete this post? This cannot be undone.')) return;
     try {
-      // Send DELETE request to remove the post
       await axios.delete(`http://localhost:5000/api/posts/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       }); 
 
-      // Remove the post from the local state
       setPosts(prev => prev.filter(p => p._id !== id));
     } catch (e) {
       alert(e?.response?.data?.error || 'Failed to delete');
       console.error(e);
     }
   };
-
-
 
   return (
     <div className='posts'>

@@ -1,4 +1,3 @@
-// src/pages/AdminDashboard.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Line, Bar } from 'react-chartjs-2';
@@ -7,7 +6,6 @@ import NavbarAdmin from '../components/navbarAdmin';
 import SidebarAdmin from '../components/sidebarAdmin';
 import './Dashboard.css';
 
-// Register Chart.js components
 ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, 
                 Title, Tooltip, Legend);
 
@@ -44,7 +42,6 @@ export default function AdminDashboard() {
     loadData();
   }, []);
 
-  // Chart options
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -66,7 +63,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Prepare chart data
   const postsChartData = {
     labels: chartData.posts?.labels || [],
     datasets: [
@@ -113,7 +109,6 @@ export default function AdminDashboard() {
       <div className="dashboard-container">
         <h2>Admin Dashboard</h2>
         <div className='main-content'>
-          {/* Metrics Section - Keep as is */}
           <div className="dashboard-metrics">
             <div className="metric-card">
               <div className="metric-icon">📣</div>
@@ -149,7 +144,6 @@ export default function AdminDashboard() {
           <div className="charts-section">
             <h3>Activity Analytics</h3>
 
-            {/* Charts */}
             <div className="charts-grid">
               <div className="chart-container">
                 <h4>Posts Created Over Time</h4>

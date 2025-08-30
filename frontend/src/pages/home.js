@@ -1,4 +1,4 @@
-// home page
+// cover page
 import React, { useState } from 'react';
 import Navbar from '../components/navbar';
 import AuthModal from '../components/authModal';
@@ -19,7 +19,6 @@ const Home = () => {
 
   const onSuccess = () => {
     setModalOpen(false);
-    // Redirect or show success message
   };
 
   return (
