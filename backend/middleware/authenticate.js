@@ -8,7 +8,8 @@ const authenticate = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     // Support tokens that have either id or userId
     const userId = decoded.id || decoded.userId;

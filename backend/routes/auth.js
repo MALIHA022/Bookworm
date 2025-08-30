@@ -7,6 +7,9 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const authMiddleware = require('../middleware/authMiddleware');
 
+// Get JWT secret with fallback
+const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
+
 // Register route
   router.post('/register', async (req, res) => {
     const { firstName, lastName, email, password, gender, dob } = req.body;
@@ -27,7 +30,23 @@ const authMiddleware = require('../middleware/authMiddleware');
 
       const user = new User({ firstName, lastName, email: emailNorm, password, gender, dob }); // role defaults to "user"
       await user.save();
-      res.json({ message: 'User registered successfully!' });
+      
+      // Generate token for automatic login after registration
+      const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+      
+      res.json({
+        message: 'User registered successfully!',
+        token,
+        user: {
+          id: user._id,
+          role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          gender: user.gender,
+          dob: user.dob,
+        },
+      });
     } catch (err) {
       res.status(500).json({ error: 'Server error during registration.' });
     }
@@ -47,7 +66,7 @@ const authMiddleware = require('../middleware/authMiddleware');
       if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
       // Include role in token
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
 
       res.json({
         message: 'Login successful',
@@ -99,7 +118,7 @@ const authMiddleware = require('../middleware/authMiddleware');
         await admin.save();
       }
     
-      const token = jwt.sign({ id: admin._id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      const token = jwt.sign({ id: admin._id, role: 'admin' }, JWT_SECRET, { expiresIn: '1d' });
     
       res.json({
         message: 'Admin login successful',
