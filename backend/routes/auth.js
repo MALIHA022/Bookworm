@@ -269,4 +269,59 @@ router.post('/change-password', authenticate, async (req, res) => {
   }
 });
 
+// Request Account Activation (for suspended users)
+router.post('/request-activation', async (req, res) => {
+  console.log('Activation request received:', req.body);
+  try {
+    const { email } = req.body;
+    if (!email) {
+      console.log('No email provided');
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const emailNorm = email.trim().toLowerCase();
+    console.log('Looking for user with email:', emailNorm);
+    
+    const user = await User.findOne({ email: emailNorm });
+    console.log('User found:', user ? 'Yes' : 'No');
+    
+    if (!user) {
+      console.log('User not found with email:', emailNorm);
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    console.log('User status:', user.status);
+    if (user.status !== 'suspended') {
+      console.log('User is not suspended, status:', user.status);
+      return res.status(400).json({ error: 'Account is not suspended' });
+    }
+
+    // Create activation request notification
+    const activationRequest = {
+      message: `Account activation requested from user ${user.email}`,
+      at: new Date(),
+      userId: user._id,
+      userEmail: user.email,
+      type: 'activation_request',
+      status: 'pending'
+    };
+
+    console.log('Adding activation request to warnings:', activationRequest);
+    
+    // Store in user's warnings array (reusing existing structure)
+    user.warnings.push(activationRequest);
+    console.log('Warnings array length after push:', user.warnings.length);
+    
+    await user.save();
+    console.log('User saved successfully');
+
+    res.json({ message: 'Activation request sent successfully' });
+
+  } catch (err) {
+    console.error('Request activation error:', err);
+    console.error('Error details:', err.message);
+    res.status(500).json({ error: 'Server error during activation request' });
+  }
+});
+
 module.exports = router;

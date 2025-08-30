@@ -318,7 +318,7 @@ router.patch('/users/:userId/toggle-status', authenticate, requireAdmin, async (
     console.log('Current user status:', user.status);
     
     // Toggle between active and suspended
-    user.status = user.status === 'active' ? 'suspended' : 'active';
+    user.status = user.status === 'suspended' ? 'active' : 'suspended';
     console.log('New user status:', user.status);
     
     await user.save();
@@ -331,6 +331,37 @@ router.patch('/users/:userId/toggle-status', authenticate, requireAdmin, async (
   } catch (err) {
     console.error('Toggle user status error:', err);
     res.status(500).json({ error: 'Server error during status update' });
+  }
+});
+
+// Get activation requests for admin
+router.get('/activation-requests', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find({
+      'warnings.type': 'activation_request',
+      'warnings.status': 'pending'
+    }).select('firstName lastName email warnings');
+
+    const activationRequests = [];
+    users.forEach(user => {
+      user.warnings.forEach(warning => {
+        if (warning.type === 'activation_request' && warning.status === 'pending') {
+          activationRequests.push({
+            id: warning._id,
+            message: warning.message,
+            at: warning.at,
+            userId: warning.userId,
+            userEmail: warning.userEmail,
+            userName: `${user.firstName} ${user.lastName}`
+          });
+        }
+      });
+    });
+
+    res.json({ activationRequests });
+  } catch (err) {
+    console.error('Get activation requests error:', err);
+    res.status(500).json({ error: 'Server error fetching activation requests' });
   }
 });
 

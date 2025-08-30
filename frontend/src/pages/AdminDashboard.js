@@ -14,6 +14,7 @@ export default function AdminDashboard() {
   const [metrics, setMetrics] = useState({});
   const [chartData, setChartData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [activationRequests, setActivationRequests] = useState([]);
 
   const getAuth = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -23,13 +24,15 @@ export default function AdminDashboard() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const [metricsRes, chartDataRes] = await Promise.all([
+        const [metricsRes, chartDataRes, activationRes] = await Promise.all([
           axios.get('http://localhost:5000/api/admin/metrics', getAuth()),
-          axios.get('http://localhost:5000/api/admin/chart-data', getAuth())
+          axios.get('http://localhost:5000/api/admin/chart-data', getAuth()),
+          axios.get('http://localhost:5000/api/admin/activation-requests', getAuth())
         ]);
         
         setMetrics(metricsRes.data);
         setChartData(chartDataRes.data);
+        setActivationRequests(activationRes.data.activationRequests || []);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
       } finally {
@@ -176,6 +179,26 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Activation Requests Section */}
+          {activationRequests.length > 0 && (
+            <div className="activation-requests-section">
+              <h3>Pending Activation Requests</h3>
+              <div className="activation-requests-list">
+                {activationRequests.map((request, index) => (
+                  <div key={request.id} className="activation-request-item">
+                    <div className="request-info">
+                      <strong>{request.userName}</strong> ({request.userEmail})
+                    </div>
+                    <div className="request-message">{request.message}</div>
+                    <div className="request-time">
+                      Requested: {new Date(request.at).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

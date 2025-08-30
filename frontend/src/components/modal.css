@@ -474,3 +474,44 @@
 .close-btn:hover {
   background-color: #5a6268;
 }
+
+/* Status Display Styling */
+.status-active {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-suspended {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* Activation Request Styling */
+.activation-request-section {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.activation-request-section p {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 14px;
+}
+
+.activation-request-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.activation-request-btn:hover {
+  background-color: #0056b3;
+}

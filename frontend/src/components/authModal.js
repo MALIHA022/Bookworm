@@ -26,6 +26,10 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
   const [changeNewPassword, setChangeNewPassword] = useState('');
   const [changeConfirmPassword, setChangeConfirmPassword] = useState('');
 
+  // Activation request states
+  const [showActivationRequest, setShowActivationRequest] = useState(false);
+  const [activationEmail, setActivationEmail] = useState('');
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -163,6 +167,33 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
     }
   };
 
+  // Handle activation request
+  const handleActivationRequest = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      console.log('Sending activation request for email:', activationEmail);
+      
+      const res = await axios.post('http://localhost:5000/api/auth/request-activation', { 
+        email: activationEmail 
+      });
+      
+      console.log('Activation request response:', res.data);
+      setSuccessMessage('Activation request sent successfully! Admin will review your request.');
+      setShowActivationRequest(false);
+      setActivationEmail('');
+    } catch (error) {
+      console.error('Activation request error:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to send activation request';
+      setError(`Activation request failed: ${errorMessage}`);
+    }
+  };
+
   // Reset form states
   const resetFormStates = () => {
     setError('');
@@ -176,6 +207,8 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
     setCurrentPassword('');
     setChangeNewPassword('');
     setChangeConfirmPassword('');
+    setShowActivationRequest(false);
+    setActivationEmail('');
   };
 
   // Close modal and reset states
@@ -189,7 +222,7 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
       <div className="modal-content">
         <span className="close-btn" onClick={handleClose}>❌</span>
         
-        {!showForgotPassword && !showResetPassword && !showChangePassword && (
+        {!showForgotPassword && !showResetPassword && !showChangePassword && !showActivationRequest && (
           <form className="default-form" onSubmit={handleSubmit}>
             <h2>{type === 'login' ? 'Login' : 'Register'}</h2>
             {type === 'register' && (
@@ -267,7 +300,26 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
               </>
             )}
 
-            {error && <div className="error-message">{error}</div>}
+            {error && (
+              <div className="error-message">
+                {error}
+                {error.includes('Account suspended for suspicious activity') && (
+                  <div className="activation-request-section">
+                    <p>Your account has been suspended. You can request activation from an administrator.</p>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setShowActivationRequest(true);
+                        setActivationEmail(email); // Pre-fill with current email
+                      }}
+                      className="activation-request-btn"
+                    >
+                      Request Activation
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
             {successMessage && <div className="success-message">{successMessage}</div>}
             
             <button className="submit" type="submit">
@@ -393,6 +445,34 @@ const AuthModal = ({ type, onClose, onSuccess }) => {
             <button 
               type="button" 
               onClick={() => setShowChangePassword(false)}
+              className="secondary-button"
+            >
+              Back to Login
+            </button>
+          </form>
+        )}
+
+        {/* Activation Request Form */}
+        {showActivationRequest && (
+          <form className="default-form" onSubmit={handleActivationRequest}>
+            <h2>Request Account Activation</h2>
+            <p>Enter your email to request an account activation from the administrator.</p>
+            
+            <input
+              type="email"
+              placeholder="Email"
+              value={activationEmail}
+              onChange={(e) => setActivationEmail(e.target.value)}
+              required
+            />
+
+            {error && <div className="error-message">{error}</div>}
+            {successMessage && <div className="success-message">{successMessage}</div>}
+            
+            <button className="submit" type="submit">Send Activation Request</button>
+            <button 
+              type="button" 
+              onClick={() => setShowActivationRequest(false)}
               className="secondary-button"
             >
               Back to Login
