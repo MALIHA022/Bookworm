@@ -34,7 +34,7 @@ router.post('/create', authenticate, async (req, res) => {
     content: content || null,
     description: description || null,
     price: price || null,
-    user: req.user.id,  // Associate the post with the authenticated user
+    user: req.user.id,
   });
 
   try {
@@ -59,22 +59,20 @@ router.get('/', async (req, res) => {
 // Search posts by book title, post title, or author
 router.get('/search', async (req, res) => {
   try {
-    const { q, type } = req.query; // q = search query, type = filter by post type
+    const { q, type } = req.query;
     
     let searchQuery = {};
-    
-    // Add type filter if specified
+
     if (type && type !== 'all') {
       searchQuery.type = type;
     }
     
-    // Add search query if provided
     if (q && q.trim()) {
-      const searchRegex = new RegExp(q.trim(), 'i'); // case-insensitive search
+      const searchRegex = new RegExp(q.trim(), 'i');
       searchQuery.$or = [
-        { bookTitle: searchRegex },    // Search in book titles
-        { title: searchRegex },        // Search in post titles (for reviews)
-        { author: searchRegex }        // Search in author names
+        { bookTitle: searchRegex },
+        { title: searchRegex },
+        { author: searchRegex }
       ];
     }
     
@@ -97,7 +95,7 @@ router.get('/user/:userId', authenticate, async (req, res) => {
 });
 
 
-// Toggle bookmark for a post for the authenticated user
+// Toggle bookmark 
 router.post('/:id/bookmark', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -121,7 +119,7 @@ router.post('/:id/bookmark', authenticate, async (req, res) => {
   }
 });
 
-// Check if a specific post is bookmarked by the authenticated user
+// Check if a post is bookmarked by the user
 router.get('/:id/bookmarked', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('bookmarks');
@@ -135,7 +133,7 @@ router.get('/:id/bookmarked', authenticate, async (req, res) => {
   }
 });
 
-// Get all bookmarked posts for the authenticated user
+// Get all bookmarked posts
 router.get('/bookmarks', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
@@ -152,7 +150,7 @@ router.get('/bookmarks', authenticate, async (req, res) => {
 });
 
 
-// Toggle wishlist for a post for the authenticated user
+// Toggle wishlist 
 router.post('/:id/wishlist', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -176,7 +174,7 @@ router.post('/:id/wishlist', authenticate, async (req, res) => {
   }
 });
 
-// Check if a specific post is wishlisted by the authenticated user
+// Check if a post is wishlisted
 router.get('/:id/wishlisted', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('wishlist');
@@ -190,7 +188,7 @@ router.get('/:id/wishlisted', authenticate, async (req, res) => {
   }
 });
 
-// Get all wishlisted posts for the authenticated user
+// Get all wishlisted posts
 router.get('/wishlist', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
@@ -206,7 +204,7 @@ router.get('/wishlist', authenticate, async (req, res) => {
   }
 });
 
-// Toggle like for a post for the authenticated user and update like count on Post
+// Toggle like and update like count
 router.post('/:id/like', authenticate, async (req, res) => {
   try {
     const postId = req.params.id;
@@ -238,7 +236,7 @@ router.post('/:id/like', authenticate, async (req, res) => {
   }
 });
 
-// Check if a specific post is liked by the authenticated user
+// Check if liked
 router.get('/:id/liked', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('likedPosts');
@@ -252,8 +250,7 @@ router.get('/:id/liked', authenticate, async (req, res) => {
   }
 });
 
-
-// Edit a post (owner or admin)
+// Edit a post
 router.put('/:id', authenticate, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -261,7 +258,6 @@ router.put('/:id', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Check if the authenticated user owns the post or is an admin
     const isOwner = post.user?.toString() === req.user.id;
     const isAdmin = req.user.role === 'admin';
 
@@ -287,7 +283,7 @@ router.put('/:id', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'Price is required for sell posts.' });
     }
 
-    // Update the post
+    // Update post
     post.type = type;
     post.title = title || null;
     post.bookTitle = bookTitle || null;
@@ -304,20 +300,16 @@ router.put('/:id', authenticate, async (req, res) => {
   }
 });
 
-
-
-// Delete a post (owner or admin)
+// Delete a post
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    // Find the post by ID
     const post = await Post.findById(req.params.id);
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Check if the authenticated user owns the post or is an admin
     const isOwner = post.user?.toString() === req.user.id;
-    const isAdmin = req.user.role === 'admin'; // Assuming you have a 'role' field in User schema
+    const isAdmin = req.user.role === 'admin'; 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ error: 'Not allowed to delete this post' });
     }
@@ -325,7 +317,6 @@ router.delete('/:id', authenticate, async (req, res) => {
     // Remove the post
     await Post.deleteOne({ _id: post._id });
 
-    // OPTIONAL: Cleanup User's bookmarks, wishlist, and likedPosts arrays
     const postId = post._id;
     await User.updateMany({}, { $pull: { bookmarks: postId, wishlist: postId, likedPosts: postId } });
 
@@ -337,7 +328,6 @@ router.delete('/:id', authenticate, async (req, res) => {
 });
 
 
-
 // User reports a post
 router.post('/:id/report', authenticate, async (req, res) => {
   try {
@@ -347,7 +337,7 @@ router.post('/:id/report', authenticate, async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ error: 'Post not found' });
 
-    // Check if user has already reported this post
+    // Check if already reported
     const existingReport = await Report.findOne({
       post: post._id,
       reportedBy: req.user.id
@@ -361,7 +351,7 @@ router.post('/:id/report', authenticate, async (req, res) => {
       post: post._id,
       reportedBy: req.user.id,
       reason,
-      status: 'pending' // pending, reviewed, resolved
+      status: 'pending'
     });
 
     res.status(201).json({ message: 'Post reported successfully', report });
@@ -371,7 +361,7 @@ router.post('/:id/report', authenticate, async (req, res) => {
   }
 });
 
-// Mark a post as not interested for the authenticated user
+// Mark not interested 
 router.post('/:id/not-interested', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('notInterested');
@@ -390,7 +380,7 @@ router.post('/:id/not-interested', authenticate, async (req, res) => {
   }
 });
 
-// Authenticated feed excluding notInterested posts
+// excluding notInterested posts
 router.get('/feed', authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('notInterested');

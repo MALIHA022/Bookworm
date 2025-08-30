@@ -6,8 +6,6 @@ const User = require('../models/User');
 const router = express.Router(); 
 const bcrypt = require('bcryptjs');
 const authenticate = require('../middleware/authenticate');
-
-// Get JWT secret with fallback
 const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
 
 // Register route
@@ -31,7 +29,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
       const user = new User({ firstName, lastName, email: emailNorm, password, gender, dob }); // role defaults to "user"
       await user.save();
       
-      // Generate token for automatic login after registration
       const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
       
       res.json({
@@ -72,7 +69,6 @@ const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
-      // Include role in token
       const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
 
       res.json({
@@ -99,7 +95,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
     try {
       const { email, password } = req.body;
     
-      // Fixed creds
+      // Fixed creds for admin
       const ADMIN_EMAIL = 'admin@bookworm.local';
       const ADMIN_PASS  = 'bookwormer';
     
@@ -176,11 +172,9 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
     console.log('Reset token saved successfully');
 
-    // In a real app, you would send this via email
-    // For now, we'll return it in the response for testing
     res.json({
       message: 'Password reset token generated successfully',
-      resetToken: resetToken, // Remove this in production
+      resetToken: resetToken, 
       expiresIn: '1 hour'
     });
 
@@ -207,15 +201,13 @@ router.post('/reset-password', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check if reset token is valid and not expired
+    // Check token validity
     if (user.resetPasswordToken !== resetToken || user.resetPasswordExpires < Date.now()) {
       return res.status(400).json({ error: 'Invalid or expired reset token' });
     }
 
-    // Hash new password manually
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     
-    // Use findByIdAndUpdate to bypass the pre-save hook
     await User.findByIdAndUpdate(user._id, {
       password: hashedPassword,
       resetPasswordToken: undefined,
@@ -236,7 +228,7 @@ router.post('/reset-password', async (req, res) => {
   }
 });
 
-// Change Password (requires authentication)
+// Change Password
 router.post('/change-password', authenticate, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -269,7 +261,7 @@ router.post('/change-password', authenticate, async (req, res) => {
   }
 });
 
-// Request Account Activation (for suspended users)
+// Request Account Activation
 router.post('/request-activation', async (req, res) => {
   console.log('Activation request received:', req.body);
   try {
@@ -308,7 +300,6 @@ router.post('/request-activation', async (req, res) => {
 
     console.log('Adding activation request to warnings:', activationRequest);
     
-    // Store in user's warnings array (reusing existing structure)
     user.warnings.push(activationRequest);
     console.log('Warnings array length after push:', user.warnings.length);
     

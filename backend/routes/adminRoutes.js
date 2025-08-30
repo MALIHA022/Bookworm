@@ -11,7 +11,6 @@ const Post = require('../models/Post');
 const User = require('../models/User');
 const Report = require('../models/Reports');
 
-// Try to load Report model if it exists
 let Reports = null;
 try {
   Reports = require('../models/Reports');
@@ -38,11 +37,9 @@ router.get('/metrics', authenticate, requireAdmin, async (req, res) => {
 // Chart data for analytics
 router.get('/chart-data', authenticate, requireAdmin, async (req, res) => {
   try {
-    // Get data for the last 30 days
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    // Generate date labels for the last 30 days
     const dateLabels = [];
     const dateData = [];
     for (let i = 29; i >= 0; i--) {
@@ -120,7 +117,7 @@ router.get('/chart-data', authenticate, requireAdmin, async (req, res) => {
 
 //list reports 
 router.get('/reports', authenticate, requireAdmin, async (req, res) => {
-  if (!Report) return res.json({ reports: [] }); // no model yet; return empty list
+  if (!Report) return res.json({ reports: [] }); 
   const { status } = req.query;
 
   let query = {};
@@ -128,7 +125,7 @@ router.get('/reports', authenticate, requireAdmin, async (req, res) => {
     query = { status: 'pending' };
   } else if (status === 'resolved') {
     query = { status: { $in: ['resolved', 'dismissed'] } };
-  } // else: no status filter -> all
+  } 
 
   const reports = await Report.find(query)
     .sort({ createdAt: -1 })
@@ -213,7 +210,6 @@ router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) =>
       // Remove the reported post
       await Post.findByIdAndDelete(report.post._id);
       
-      // Clean up from all users' arrays
       await User.updateMany({}, { 
         $pull: { 
           bookmarks: report.post._id, 
@@ -222,7 +218,7 @@ router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) =>
         } 
       });
 
-      // Mark all reports for this post as resolved with action 'post_removed'
+      // Mark all reports for this post as 'post_removed'
       await Report.updateMany(
         { post: report.post._id },
         { $set: { status: 'resolved', adminAction: 'post_removed' } }
@@ -237,7 +233,6 @@ router.put('/reports/:reportId', authenticate, requireAdmin, async (req, res) =>
       // Add warning to the user who posted the reported content
       const postUser = await User.findById(report.post.user);
       if (postUser) {
-        // Get post details for the warning
         const post = await Post.findById(report.post._id);
         if (post) {
           postUser.warnings.push({
@@ -334,143 +329,6 @@ router.patch('/users/:userId/toggle-status', authenticate, requireAdmin, async (
   }
 });
 
-// // Get activation requests
-// router.get('/activation-requests', authenticate, requireAdmin, async (req, res) => {
-//   try {
-//     const status = String(req.query.status || 'pending');
-//     const users = await User.find({
-//       'warnings.type': 'activation_request',
-//       'warnings.status': status
-//     }).select('firstName lastName email warnings');
-
-//     const activationRequests = [];
-//     users.forEach(user => {
-//       user.warnings.forEach(w => {
-//         if (w.type === 'activation_request' && w.status === status) {
-//           activationRequests.push({
-//             id: w._id,
-//             type: w.type,
-//             status: w.status,
-//             message: w.message,
-//             at: w.at,
-//             userId: w.userId,       // optional: if you stored it
-//             userEmail: w.userEmail || user.email,
-//             userName: `${user.firstName} ${user.lastName}`,
-//             read: !!w.read
-//           });
-//         }
-//       });
-//     });
-
-
-//     activationRequests.sort((a, b) => new Date(b.at) - new Date(a.at));
-
-//     res.json({ activationRequests });
-//   } catch (err) {
-//     console.error('Get activation requests error:', err);
-//     res.status(500).json({ error: 'Server error fetching activation requests' });
-//   }
-// });
-
-// router.get('/notifications', authenticate, requireAdmin, async (req, res) => {
-//   try {
-//     const unreadOnly = String(req.query.unread || '') === 'true';
-//     const typeFilter = req.query.type ? String(req.query.type) : null;
-
-//     // Pull users that have any warnings at all. We’ll filter in memory for clarity.
-//     const users = await User.find({ 'warnings.0': { $exists: true } })
-//       .select('firstName lastName email warnings');
-
-//     const notifications = [];
-//     users.forEach(user => {
-//       (user.warnings || []).forEach(w => {
-//         if (typeFilter && w.type !== typeFilter) return;
-//         if (unreadOnly && w.read === true) return;
-
-//         notifications.push({
-//           id: w._id,
-//           type: w.type,
-//           status: w.status,
-//           message: w.message,
-//           at: w.at,
-//           userId: w.userId,                 // optional: if you stored it
-//           userEmail: w.userEmail || user.email,
-//           userName: `${user.firstName} ${user.lastName}`,
-//           read: !!w.read
-//         });
-//       });
-//     });
-
-//     // Sort newest first
-//     notifications.sort((a, b) => new Date(b.at) - new Date(a.at));
-
-//     res.json({ notifications });
-//   } catch (err) {
-//     console.error('Get admin notifications error:', err);
-//     res.status(500).json({ error: 'Server error fetching notifications' });
-//   }
-// });
-
-// // router.patch('/notifications/:warningId/read', authenticate, requireAdmin, async (req, res) => {
-// //   try {
-// //     const wid = req.params.id;
-// //     const result = await User.findOneAndUpdate(
-// //       { 'warnings._id': wid },
-// //       { $set: { 'warnings.$.read': true } },
-// //       { new: true }
-// //     ).select('_id');
-
-// //     if (!result) return res.status(404).json({ error: 'Notification not found' });
-// //     res.json({ ok: true });
-// //   } catch (err) {
-// //     console.error('Mark notification read error:', err);
-// //     res.status(500).json({ error: 'Server error updating notification' });
-// //   }
-// // });
-// router.put('/notifications/:warningId/read', authenticate, async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id);
-//     if (!user) {
-//       return res.status(404).json({ error: 'User not found' });
-//     }
-
-//     const warning = user.warnings.id(req.params.warningId);
-//     if (!warning) {
-//       return res.status(404).json({ error: 'Warning not found' });
-//     }
-
-//     warning.read = true;
-//     await user.save();
-
-//     res.json({ message: 'Warning marked as read' });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: 'Error updating warning' });
-//   }
-// });
-
-
-// router.patch('/activation-requests/:id/status', authenticate, requireAdmin, async (req, res) => {
-//   try {
-//     const wid = req.params.id;
-//     const { status } = req.body;
-//     if (!['approved', 'rejected', 'pending'].includes(status)) {
-//       return res.status(400).json({ error: 'Invalid status' });
-//     }
-
-//     const doc = await User.findOneAndUpdate(
-//       { 'warnings._id': wid, 'warnings.type': 'activation_request' },
-//       { $set: { 'warnings.$.status': status, 'warnings.$.read': true } },
-//       { new: true }
-//     ).select('_id');
-
-//     if (!doc) return res.status(404).json({ error: 'Activation request not found' });
-//     res.json({ ok: true });
-//   } catch (err) {
-//     console.error('Update activation request status error:', err);
-//     res.status(500).json({ error: 'Server error updating activation request' });
-//   }
-// });
 
 // Get activation requests
 router.get('/activation-requests', authenticate, requireAdmin, async (req, res) => {
@@ -487,7 +345,7 @@ router.get('/activation-requests', authenticate, requireAdmin, async (req, res) 
       (user.warnings || []).forEach(w => {
         if (w.type === 'activation_request' && w.status === status) {
           activationRequests.push({
-            id: w._id, // normalize as id
+            id: w._id, 
             type: w.type,
             status: w.status,
             message: w.message,
@@ -509,7 +367,7 @@ router.get('/activation-requests', authenticate, requireAdmin, async (req, res) 
   }
 });
 
-// Unified admin notifications
+// admin notifications
 router.get('/notifications', authenticate, requireAdmin, async (req, res) => {
   try {
     const unreadOnly = String(req.query.unread || '') === 'true';
@@ -525,7 +383,7 @@ router.get('/notifications', authenticate, requireAdmin, async (req, res) => {
         if (unreadOnly && w.read === true) return;
 
         notifications.push({
-          id: w._id, // normalize as id
+          id: w._id,
           type: w.type,
           status: w.status,
           message: w.message,
@@ -546,10 +404,7 @@ router.get('/notifications', authenticate, requireAdmin, async (req, res) => {
   }
 });
 
-/**
- * ADMIN: mark any warning (by warning _id) as read
- * PATCH /api/admin/notifications/:id/read
- */
+// Mark a notification as read
 router.patch('/notifications/:id/read', authenticate, requireAdmin, async (req, res) => {
   try {
     const wid = req.params.id;
@@ -571,52 +426,5 @@ router.patch('/notifications/:id/read', authenticate, requireAdmin, async (req, 
   }
 });
 
-// If you also want BULK read for admin (optional)
-/*
-router.patch('/notifications/read', authenticate, requireAdmin, async (req, res) => {
-  try {
-    const ids = Array.isArray(req.body.ids) ? req.body.ids : [];
-    const valid = ids.filter(id => mongoose.isValidObjectId(id));
-    if (!valid.length) return res.status(400).json({ error: 'No valid ids provided' });
-
-    const result = await User.updateMany(
-      { 'warnings._id': { $in: valid } },
-      { $set: { 'warnings.$[w].read': true } },
-      { arrayFilters: [{ 'w._id': { $in: valid } }] }
-    );
-
-    res.json({ ok: true, matched: result.matchedCount, modified: result.modifiedCount });
-  } catch (err) {
-    console.error('Bulk mark read error:', err);
-    res.status(500).json({ error: 'Server error updating notifications' });
-  }
-});
-*/
-
-// Update activation request status
-router.patch('/activation-requests/:id/status', authenticate, requireAdmin, async (req, res) => {
-  try {
-    const wid = req.params.id;
-    const { status } = req.body;
-    if (!mongoose.isValidObjectId(wid)) {
-      return res.status(400).json({ error: 'Invalid activation request id' });
-    }
-    if (!['approved', 'rejected', 'pending'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
-    }
-
-    const doc = await User.findOneAndUpdate(
-      { 'warnings._id': wid, 'warnings.type': 'activation_request' },
-      { $set: { 'warnings.$.status': status, 'warnings.$.read': true } },
-      { new: true }
-    ).select('_id');
-
-    if (!doc) return res.status(404).json({ error: 'Activation request not found' });
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Update activation request status error:', err);
-    res.status(500).json({ error: 'Server error updating activation request' });
-  }
-});
 
 module.exports = router;
