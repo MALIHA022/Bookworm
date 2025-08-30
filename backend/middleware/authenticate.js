@@ -10,14 +10,11 @@ const authenticate = async (req, res, next) => {
   try {
     const JWT_SECRET = process.env.JWT_SECRET || 'bookwormsecret';
     const decoded = jwt.verify(token, JWT_SECRET);
-
-    // Support tokens that have either id or userId
     const userId = decoded.id || decoded.userId;
     if (!userId) {
       return res.status(401).json({ error: 'Invalid token payload' });
     }
 
-    // Fetch user to attach role and ensure the account exists
     const user = await User.findById(userId).select('role firstName lastName email');
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
