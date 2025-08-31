@@ -231,7 +231,7 @@ const PostCard = ({ post }) => {
     <div className="bookpostcard">
           <div className='card-header'>
             <span className={`pill pill-${post.type}`}>{post.type}</span>
-            <h4> {post.user.firstName} {post.user.lastName}</h4>
+            <h4>{post.user?.firstName} {post.user?.lastName}</h4>
           </div>
 
         <div className='card-body'>
