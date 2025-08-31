@@ -50,7 +50,7 @@ export default function Explore() {
       fetchData();
     }, [tab, token]);
 
-  // Search 
+  // Search
   const handleSearch = async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -142,7 +142,7 @@ export default function Explore() {
           {loading && <p className="muted">Loading…</p>}
           {err && <p className="error">{err}</p>}
           
-          {/* Show search results */}
+          {/* Show search results if available */}
           {searchQuery && !isSearching && searchResults.length > 0 && (
             <div className="search-results-header">
               <h3>Search Results for "{searchQuery}"</h3>
@@ -161,24 +161,26 @@ export default function Explore() {
           <div className='explore-section'>
             <div className="cards">
               {(searchQuery ? searchResults : items).map(p => (
-                <article key={p._id} className="card">
-                  <header className="card-head">
+                <div key={p._id} className="card">
+                  <div className="card-head">
                     <span className={`pill ${p.type}`}>{p.type}</span>
                     <h3 className="title">{p.bookTitle || p.title || 'Untitled'}</h3>
-                  </header>
-                  {p.author && <p className="sub">by {p.author}</p>}
-                  {p.description && <p className="desc">{p.description}</p>}
-                  {p.content && <p className="desc">{p.content}</p>}
-                  {p.type === 'sell' && typeof p.price === 'number' && (
-                    <p className="price">Price: ৳ {p.price}</p>
-                  )}
-                  <footer className="metadata">
+                  </div>
+                  <div className="c-body">
+                    {p.author && <p className="sub">by {p.author}</p>}
+                    {p.description && <p className="desc">{p.description}</p>}
+                    {p.content && <p className="desc">{p.content}</p>}
+                    {p.type === 'sell' && typeof p.price === 'number' && (
+                      <p className="price">Price: ৳ {p.price}</p>
+                    )}
+                  </div>
+                  <div className="metadata">
                     <span>
                       {p.user?.firstName} {p.user?.lastName}
                     </span>
                     <span>{new Date(p.createdAt).toLocaleString()}</span>
-                  </footer>
-                </article>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

@@ -1,1 +1,16 @@
 # Bookworm
+BookWorm is a multi-page web-based social networking platform for book enthusiasts. It enables users to create book reviews, discuss favorite books, donate or sell books, and connect with others who share similar interests. The platform consists of both user-facing and admin-facing functionalities. The purpose of this project is to provide a centralized, interactive, and community-driven platform where users can:
+- Share their book reviews and posts.
+- Donate, sell, or seek books.
+- Maintain a wishlist and get flagged notifications .
+- Communicate with other users and book donors through a simple in-app messaging system.
+- Ensure a safe environment with admin-moderated content.
+
+This platform connects - general book lovers, readers, and collectors, students or individuals looking for affordable books, book donors and sellers. It also ensures platform administrators manage reported content.
+
+-----------
+
+it has two types of users- regular users and admin. admin is predefined.
+registering automatically logs in user. registered information is stored in the backend. user can edit/ udate their information. users can create posts. there are three type of posts. review, donate and sell. review and donate posts have fields Book title, author name and description. sell  posts have Book title, author name, price and description. user can edit and delete a post. all the recently created posts from different users are available on user dashboard. from the posts of user dashboard user can like, bookmark and wishlist posts. like count is visible for every post. bookmarked posts are available on bookmarks page. wishlisted posts are available on wishlisted page. from wishlisted page users can send messages to the user who created the post. messages are stored in messages tab of wishlist page. wishlisted posts are availabl eon the wishlisted posts tab of wishlist page. there is also an explore page where users can explore sell and donate posts. on every posts there is a report and not intrested dropdown. users can report posts to admins if they find it offensive. admin can review and respond. choosing not intrested makes the post never appear prst that specific user again. int the navbar there is a notification icon. messages from other user and admin warnings appear in the notification. 
+
+in admin, there is admin dashboard where metrices of total posts, total user, total reports, pending reports exits. below are line diagrams that show total posts created and reports created in the last 30days to display website engagement. all users list, all posts list can be accessed from the sidebar on differend pages. admin can review posts and users from these pages. from uses list admin can suspend user if anything found offensive. users can request for account activation through activation request if account is suspended. acccount activation request comes in the notification of the admin. in reposts page there are 3 tabs all, pending and resolved reports. admin can handle reports from here. all reports are shown on all tab. pending tab shows report as cards wher admin can respond to it through delete post, warn user, and dismiss. dismissed and warned reports appear in resolved reports tab.

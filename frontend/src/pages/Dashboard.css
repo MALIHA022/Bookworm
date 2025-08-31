@@ -44,6 +44,20 @@
   left: 60px;
 }
 
+.wishlist-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.c-body {
+  padding: 12px 16px;
+  color: #333;
+}
+
 .posts-section .no-posts {
   margin: 5px 0;
   color: #ff3333;
