@@ -13,7 +13,16 @@ router.get('/profile', authenticate, async (req, res) => {
     }
 
     const { firstName, lastName, email, gender, dob } = user;
-    res.json({ firstName, lastName, email, gender, dob });
+    res.json({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      gender: user.gender,
+      dob: user.dob,
+      bookmarks: user.bookmarks || [],
+      wishlist: user.wishlist || [],
+      likedPosts: user.likedPosts || []
+    });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -40,6 +49,7 @@ router.put('/profile', authenticate, async (req, res) => {
     user.email = email;
     user.gender = gender;
     user.dob = dob;
+    
 
     await user.save();
 
@@ -48,6 +58,38 @@ router.put('/profile', authenticate, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+router.put('/profile', authenticate, async (req, res) => {
+  try {
+    const updates = {};
+    ['firstName', 'lastName', 'email', 'gender', 'dob'].forEach(k => {
+      if (req.body[k] !== undefined) updates[k] = req.body[k];
+    });
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updates },
+      { new: true }
+    ).lean();
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        gender: user.gender,
+        dob: user.dob
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 // Route to update the user's password (Example)
 router.put('/update-password', authenticate, async (req, res) => {

@@ -10,7 +10,7 @@ const PostDetails = ({ post }) => {
         <section className='user-info'>
         <div className='post-header'>
           <span className={post.type}>Post Type: {post.type}</span>
-          <h4> Posted By: {post.user.firstName} {post.user.lastName}</h4>
+          <h4> Posted By: {post.user?.firstName} {post.user?.lastName}</h4>
           <h4> Total Likes: {post.likes}</h4>
         </div>
         </section>
