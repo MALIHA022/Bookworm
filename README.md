@@ -65,4 +65,5 @@ BookWorm is a multi-page web-based social networking platform for book enthusias
 
 ---
 
-## 🗂️ Project Structure (Overview)
+## 📜 License
+This project is created for learning purpose only. Do not copy, modify, merge, publish, and distribute this software.
